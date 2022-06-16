@@ -23,9 +23,9 @@ min(Insurance_by_ID$PolicyDuration_Months)
 mean(Insurance_by_ID$PolicyDuration_Months)
 median(Insurance_by_ID$PolicyDuration_Months)
 
-Claims_cost_byID <- Commercial %>%
+Claims_cost_by_Class <- Commercial %>%
   group_by(policy_id) %>% filter(total_claims_cost, na.rm()) %>%
-  summarise(Total_cost = sum(total_claims_cost))#trying to get amnt of claims each ID
+  summarise(Total_cost = sum(total_claims_cost))#trying to get amnt of claims each Class
 
 
 
