@@ -11,7 +11,7 @@ Commercial <- read.csv("ACTL3142Data.csv")
 attach(Commercial)
 
 #changing qualitative variables to factors
-vehicle_class<-as.factor(vehicle_class)
+vehicle_class<-as.character(vehicle_class)
 risk_state_name<-as.factor(risk_state_name)
 
 Insurance_by_ID <- Commercial %>% 
@@ -28,6 +28,11 @@ Claims_cost_by_Class <- Commercial %>%
   summarise(Total_cost = sum(total_claims_cost))#trying to get amnt of claims each Class
 
 
+Claims_by_class <- Commercial %>%
+  group_by(vehicle_class) %>%
+  summarise(N_claims = sum(!is.na(total_claims_cost)))
+  
+#  Ave_claim_amt = mean(na.omit(total_claims_cost))
 
 #Comments to self - Getting accident count could be useful, 
 #therefore sorting by policy id could be useful (how many accidents each vehicle has had)
