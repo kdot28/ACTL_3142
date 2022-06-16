@@ -8,6 +8,8 @@ library(usethis)
 
 Commercial <- read.csv("ACTL3142Data.csv") #import the dataset
 
+attach(Commercial)
+
 
 Insurance_by_ID <- Commercial %>% 
   group_by(policy_id) %>% 
