@@ -6,10 +6,13 @@ library(readr)
 library(tidyselect)
 library(usethis)
 
-Commercial <- read.csv("ACTL3142Data.csv") #import the dataset
-
+#import the dataset
+Commercial <- read.csv("ACTL3142Data.csv") 
 attach(Commercial)
 
+#changing qualitative variables to factors
+vehicle_class<-as.factor(vehicle_class)
+risk_state_name<-as.factor(risk_state_name)
 
 Insurance_by_ID <- Commercial %>% 
   group_by(policy_id) %>% 
