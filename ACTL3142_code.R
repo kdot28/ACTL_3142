@@ -22,22 +22,7 @@ Claims_cost_byID <- Commercial %>%
   group_by(policy_id) %>% filter(total_claims_cost, na.rm()) %>%
   summarise(Total_cost = sum(total_claims_cost))#trying to get amnt of claims each ID
 
-#heloooooooo
 
-#Karan's pushing
-
-
-#TON PUSH DJJSDBF
-
-#THIS IS A SIMULATION. WE ARE NOT REAL. 
-
-#trying to puussshhhs
-
-#TOM PUSH PRT 2
-
-#code is the only thin I pull what an L - bilal 
-
-#Trial
 
 #Comments to self - Getting accident count could be useful, 
 #therefore sorting by policy id could be useful (how many accidents each vehicle has had)
