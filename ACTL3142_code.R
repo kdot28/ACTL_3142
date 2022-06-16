@@ -33,7 +33,7 @@ Claims_by_class <- Commercial %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
   
-barplot(Claims_by_class$No_claims)
+barplot(Claims_by_class$No_claims, names.arg = Claims_by_class$vehicle_class)
 
 
 #  Ave_claim_amt = mean(na.omit(total_claims_cost))
