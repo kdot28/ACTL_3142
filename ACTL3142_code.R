@@ -30,8 +30,12 @@ Claims_cost_by_Class <- Commercial %>%
 
 Claims_by_class <- Commercial %>%
   group_by(vehicle_class) %>%
-  summarise(N_claims = sum(!is.na(total_claims_cost)))
+  summarise(No_claims = sum(!is.na(total_claims_cost)),
+            Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
   
+barplot(Claims_by_class$No_claims)
+
+
 #  Ave_claim_amt = mean(na.omit(total_claims_cost))
 
 #Comments to self - Getting accident count could be useful, 
