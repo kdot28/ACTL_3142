@@ -26,6 +26,8 @@ Claims_cost_byID <- Commercial %>%
 
 #Karan's pushing
 
+#THIS IS A SIMULATION. WE ARE NOT REAL. 
+
 #Trial
 
 #Comments to self - Getting accident count could be useful, 
