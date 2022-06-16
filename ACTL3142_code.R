@@ -24,6 +24,8 @@ Claims_cost_byID <- Commercial %>%
 
 #heloooooooo
 
+#Karan's pushing
+
 #Trial
 
 #Comments to self - Getting accident count could be useful, 
