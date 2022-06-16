@@ -27,7 +27,7 @@ Claims_cost_byID <- Commercial %>%
 #Karan's pushing
 
 
-#TON PUSH
+#TON PUSH DJJSDBF
 
 #THIS IS A SIMULATION. WE ARE NOT REAL. 
 
