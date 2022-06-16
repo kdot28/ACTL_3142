@@ -30,7 +30,7 @@ Claims_cost_byID <- Commercial %>%
 
 #trying to puussshhhs
 
-#code is the only thin I pull what an L
+#code is the only thin I pull what an L - bilal 
 
 #Trial
 
