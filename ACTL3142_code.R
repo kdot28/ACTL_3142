@@ -22,6 +22,7 @@ Claims_cost_byID <- Commercial %>%
   group_by(policy_id) %>% filter(total_claims_cost, na.rm()) %>%
   summarise(Total_cost = sum(total_claims_cost))#trying to get amnt of claims each ID
 
+#heloooooooo
 
 #Trial
 
