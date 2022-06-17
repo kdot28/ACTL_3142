@@ -16,7 +16,7 @@ risk_state_name<-as.factor(risk_state_name)
 
 Insurance_by_ID <- Commercial %>% 
   group_by(policy_id) %>% 
-  summarise(PolicyDuration_Months = n())
+  summarise(PolicyDuration_Months = n(), State = unique(risk_state_name)) 
 
 By_manufacture_year <- Commercial %>% 
   group_by(year_of_manufacture) %>%
@@ -48,6 +48,10 @@ barplot(By_manufacture_year$No_vehicles, names.arg = By_manufacture_year$year_of
 min(Commercial$year_of_manufacture)
 max(Commercial$year_of_manufacture)
 mean(Commercial$year_of_manufacture)
+
+
+# POLICY ID THAT HAS TWO STATES
+A <- Commercial[policy_id == 32422,]
 
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
