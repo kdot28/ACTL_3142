@@ -13,6 +13,9 @@ attach(Commercial)
 #changing qualitative variables to factors
 vehicle_class<-as.character(vehicle_class)
 risk_state_name<-as.factor(risk_state_name)
+claim_loss_date<-as.Date(claim_loss_date)
+term_start_date<-as.Date(term_start_date)
+term_expiry_date<-as.Date(term_expiry_date)
 
 Insurance_by_ID <- Commercial %>% 
   group_by(policy_id) %>% 
@@ -52,6 +55,9 @@ mean(Commercial$year_of_manufacture)
 
 # POLICY ID THAT HAS TWO STATES
 TWOSTATEENTRY <- Commercial[policy_id == 32422,]
+
+#Number of policyholders per state
+PH_per_state <- table(Insurance_by_ID$State)
 
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
