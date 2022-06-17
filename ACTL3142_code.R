@@ -18,6 +18,10 @@ Insurance_by_ID <- Commercial %>%
   group_by(policy_id) %>% 
   summarise(PolicyDuration_Months = n())
 
+By_manufacture_year <- Commercial %>% 
+  group_by(year_of_manufacture) %>%
+  summarise(No_vehicles = sum(1+0*unique(policy_id)))
+
 max(Insurance_by_ID$PolicyDuration_Months)
 min(Insurance_by_ID$PolicyDuration_Months)
 mean(Insurance_by_ID$PolicyDuration_Months)
@@ -37,6 +41,9 @@ No_claims_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y= No_claims)
 #Barplot of Avg claim cost/class (add title etc.)
 AveCost_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y=Ave_Claim_Amt)) + 
   geom_bar(stat = "identity") 
+
+#Barplot of No.cars per manufature year
+barplot(By_manufacture_year$No_vehicles, names.arg = By_manufacture_year$year_of_manufacture)
 
 min(Commercial$year_of_manufacture)
 max(Commercial$year_of_manufacture)
