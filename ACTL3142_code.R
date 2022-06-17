@@ -23,20 +23,21 @@ min(Insurance_by_ID$PolicyDuration_Months)
 mean(Insurance_by_ID$PolicyDuration_Months)
 median(Insurance_by_ID$PolicyDuration_Months)
 
-Claims_cost_by_Class <- Commercial %>%
-  group_by(policy_id) %>% filter(total_claims_cost, na.rm()) %>%
-  summarise(Total_cost = sum(total_claims_cost))#trying to get amnt of claims each Class
-
+#EDA
 
 Claims_by_class <- Commercial %>%
   group_by(vehicle_class) %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
-  
-barplot(Claims_by_class$No_claims, names.arg = Claims_by_class$vehicle_class)
+
+ 
+No_claims_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y= No_claims)) + 
+  geom_bar(stat = "identity") #Barplot of number of claims/class (add title etc.)
+
+AveCost_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y=Ave_Claim_Amt)) + 
+  geom_bar(stat = "identity") #Barplot of Avg claim cost/class (add title etc.)
 
 
-#  Ave_claim_amt = mean(na.omit(total_claims_cost))
 
 #Comments to self - Getting accident count could be useful, 
 #therefore sorting by policy id could be useful (how many accidents each vehicle has had)
