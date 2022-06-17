@@ -51,7 +51,7 @@ mean(Commercial$year_of_manufacture)
 
 
 # POLICY ID THAT HAS TWO STATES
-A <- Commercial[policy_id == 32422,]
+TWOSTATEENTRY <- Commercial[policy_id == 32422,]
 
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
