@@ -39,9 +39,7 @@ AveCost_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y=Ave_Claim_Amt
 
 
 
-#Comments to self - Getting accident count could be useful, 
-#therefore sorting by policy id could be useful (how many accidents each vehicle has had)
-# --> see patterns? idk need to understand the data properly!
+
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
