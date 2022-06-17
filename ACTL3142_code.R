@@ -30,15 +30,17 @@ Claims_by_class <- Commercial %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
 
- 
+#Barplot of number of claims/class (add title etc.)
 No_claims_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y= No_claims)) + 
-  geom_bar(stat = "identity") #Barplot of number of claims/class (add title etc.)
+  geom_bar(stat = "identity") 
 
+#Barplot of Avg claim cost/class (add title etc.)
 AveCost_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y=Ave_Claim_Amt)) + 
-  geom_bar(stat = "identity") #Barplot of Avg claim cost/class (add title etc.)
+  geom_bar(stat = "identity") 
 
-
-
+min(Commercial$year_of_manufacture)
+max(Commercial$year_of_manufacture)
+mean(Commercial$year_of_manufacture)
 
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
