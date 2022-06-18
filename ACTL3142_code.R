@@ -22,6 +22,8 @@ term_expiry_date<-as.Date(term_expiry_date)
 
 Commercial %>% skim()
 
+#EDA (created new datasets and data visualisation)
+
 Insurance_by_ID <- Commercial %>% 
   group_by(policy_id) %>% 
   summarise(PolicyDuration_Months = n(), State = unique(risk_state_name)) 
@@ -35,12 +37,12 @@ min(Insurance_by_ID$PolicyDuration_Months)
 mean(Insurance_by_ID$PolicyDuration_Months)
 median(Insurance_by_ID$PolicyDuration_Months)
 
-#EDA
-
 Claims_by_class <- Commercial %>%
   group_by(vehicle_class) %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
+
+#Data Visualisation
 
 #Barplot of number of claims/class (add title etc.)
 No_claims_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y= No_claims)) + 
