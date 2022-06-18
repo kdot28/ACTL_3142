@@ -65,7 +65,7 @@ TWOSTATEENTRY <- Commercial[policy_id == 32422,]
 
 #Number of policyholders per state
 PH_per_state <- table(Insurance_by_ID$State)
-
+PH_per_state
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
