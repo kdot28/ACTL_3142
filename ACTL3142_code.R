@@ -5,6 +5,7 @@ library(tidyverse)
 library(readr)
 library(tidyselect)
 library(usethis)
+library(skimr)
 
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
@@ -16,6 +17,10 @@ risk_state_name<-as.factor(risk_state_name)
 claim_loss_date<-as.Date(claim_loss_date)
 term_start_date<-as.Date(term_start_date)
 term_expiry_date<-as.Date(term_expiry_date)
+
+#Conducting basic data quality checking using skimr package
+
+Commercial %>% skim()
 
 Insurance_by_ID <- Commercial %>% 
   group_by(policy_id) %>% 
