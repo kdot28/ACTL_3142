@@ -13,6 +13,9 @@ Commercial <- read.csv("ACTL3142Data.csv")
 attach(Commercial)
 Inflation <- read.csv("Inflation.csv", header = TRUE)
 attach(Inflation)
+Inflation$ï..Quarter <- as.factor(Inflation$ï..Quarter)
+Inflation$Percentage.Change <- as.numeric(sub("%", "", Inflation$Percentage.Change))
+
 
 #changing qualitative variables to factors
 vehicle_class<-as.character(vehicle_class)
@@ -45,6 +48,8 @@ Claims_by_class <- Commercial %>%
   group_by(vehicle_class) %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
+
+
 
 
 #Data Visualisation
