@@ -6,6 +6,7 @@ library(readr)
 library(tidyselect)
 library(usethis)
 library(skimr)
+library(zoo)
 
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
@@ -91,9 +92,9 @@ Quarterly_claims <- Claims_per_month %>%
 
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
-ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) + 
-     geom_line() + 
-     scale_x_date(date_labels = "%Y-%m")
+ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
+     geom_line()  
+     
 
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
