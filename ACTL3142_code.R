@@ -88,6 +88,8 @@ Claims_per_month <- total_claims_perMonth %>%
 Quarterly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%
   summarise(Total_QClaim = sum(Claims_every_AccMonth))
+
+
                                                                                  
 
 
