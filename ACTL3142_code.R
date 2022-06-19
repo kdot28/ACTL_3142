@@ -12,7 +12,7 @@ library(zoo)
 Commercial <- read.csv("ACTL3142Data.csv") 
 attach(Commercial)
 
-#changing qualitative variables to factors
+#changing qualitative variables to different classes (as per requirement)
 vehicle_class<-as.character(vehicle_class)
 risk_state_name<-as.factor(risk_state_name)
 claim_loss_date<-as.Date(claim_loss_date)
@@ -76,14 +76,17 @@ PH_per_state
 #Trying to plot total claims cost/ per quarter (compare it with Australia's inflationary data)
 
 #has claims as a log amount (so values aren't too far apart)
-total_claims_perMonth <- Commercial %>% 
+total_claims_perQ <- Commercial %>% 
   group_by(accident_month) %>%
-  summarise(Claims_every_AccMonth = (sum(na.omit(total_claims_cost))))
+  summarise(Claims_per_quarter = (sum(na.omit(total_claims_cost))))
+
 
 #manipulation for the plot (dates on the x-axis)
-Claims_per_month <- total_claims_perMonth 
+Claims_per_month <- total_claims_perQ 
 Claims_per_month$accident_month <- as.Date(Claims_per_month$accident_month)
 Claims_per_month <- Claims_per_month[order(Claims_per_month$accident_month), ]
+Claims_per_month$accident_month = as.yearqtr(Claims_per_month$accident_month)
+
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
 ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) + 
