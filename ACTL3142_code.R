@@ -11,9 +11,11 @@ library(zoo)
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
 attach(Commercial)
+
 Inflation <- read.csv("Inflation.csv", header = TRUE)
 attach(Inflation)
-Inflation$ï..Quarter <- as.factor(Inflation$ï..Quarter)
+
+Inflation$ï..Quarter <- as.yearqtr(as.Date(Inflation$ï..Quarter))
 Inflation$Percentage.Change <- as.numeric(sub("%", "", Inflation$Percentage.Change))
 plot(Inflation$ï..Quarter, Inflation$Percentage.Change)
 
