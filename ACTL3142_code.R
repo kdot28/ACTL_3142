@@ -78,7 +78,7 @@ PH_per_state
 #has claims as a log amount (so values aren't too far apart)
 total_claims_perMonth <- Commercial %>% 
   group_by(accident_month) %>%
-  summarise(Claims_every_AccMonth = log(sum(na.omit(total_claims_cost))))
+  summarise(Claims_every_AccMonth = sum(na.omit(total_claims_cost)))
 
 #manipulation for the plot (dates on the x-axis)
 Claims_per_month <- total_claims_perMonth 
