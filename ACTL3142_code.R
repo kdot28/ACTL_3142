@@ -17,6 +17,7 @@ risk_state_name<-as.factor(risk_state_name)
 claim_loss_date<-as.Date(claim_loss_date)
 term_start_date<-as.Date(term_start_date)
 term_expiry_date<-as.Date(term_expiry_date)
+accident_month <- as.Date(accident_month)
 
 #Conducting basic data quality checking using skimr package
 
@@ -47,13 +48,17 @@ Claims_by_class <- Commercial %>%
 #Barplot of number of claims/class (add title etc.)
 No_claims_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y= No_claims)) + 
   geom_bar(stat = "identity") 
+No_claims_vs_Class
 
 #Barplot of Avg claim cost/class (add title etc.)
 AveCost_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y=Ave_Claim_Amt)) + 
   geom_bar(stat = "identity") 
+AveCost_vs_Class
 
 #Barplot of No.cars per manufature year
-barplot(By_manufacture_year$No_vehicles, names.arg = By_manufacture_year$year_of_manufacture)
+No_cars_manufacture_year <- ggplot(By_manufacture_year, aes(x= year_of_manufacture, y = No_vehicles)) + 
+  geom_bar(stat = "identity")
+No_cars_manufacture_year
 
 min(Commercial$year_of_manufacture)
 max(Commercial$year_of_manufacture)
@@ -66,6 +71,24 @@ TWOSTATEENTRY <- Commercial[policy_id == 32422,]
 #Number of policyholders per state
 PH_per_state <- table(Insurance_by_ID$State)
 PH_per_state
+
+#Trying to plot total claims cost/ per quarter (compare it with Australia's inflationary data)
+
+#has claims as a log amount (so values aren't too far apart)
+total_claims_perMonth <- Commercial %>% 
+  group_by(accident_month) %>%
+  summarise(Claims_every_AccMonth = log(sum(na.omit(total_claims_cost))))
+
+#manipulation for the plot (dates on the x-axis)
+Claims_per_month <- total_claims_perMonth 
+Claims_per_month$accident_month <- as.Date(Claims_per_month$accident_month)
+Claims_per_month <- Claims_per_month[order(Claims_per_month$accident_month), ]
+
+#Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
+ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) + 
+     geom_line() + 
+     scale_x_date(date_labels = "%Y-%m")
+
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
