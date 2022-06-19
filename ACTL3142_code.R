@@ -119,10 +119,6 @@ ggplot(Quarterly_claim_freq1, aes(x = Accident_Quarter, y = Total_Q_claim_no)) +
   geom_line()                                                                      
 
 
- 
-     
-
-
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
 #could also compare number of accidents given the year of production of each vehicle 
@@ -132,4 +128,15 @@ ggplot(Quarterly_claim_freq1, aes(x = Accident_Quarter, y = Total_Q_claim_no)) +
 
 #can look ar externals as well (e.g. inflation rate, and thus relate it to insurance amount and frequency
 #note: both are to be considered as mentioned in the assignment brief)
+
+
+
+#UNEMPLOYMENT
+#https://www.abs.gov.au/articles/historical-charts-august-1966-may-2022
+
+Unemployment <- read.csv("Unemployment.csv")
+Unemployment$Quarter <- as.yearqtr(Unemployment$Quarter)
+plot(Unemployment$Quarter, Unemployment$Rate)
+lines(Unemployment$Quarter, Unemployment$Rate)
+cor.test(Unemployment$Rate, Quarterly_claim_freq1$Total_Q_claim_no)
 
