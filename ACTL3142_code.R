@@ -52,11 +52,17 @@ min(Insurance_by_ID$PolicyDuration_Months)
 mean(Insurance_by_ID$PolicyDuration_Months)
 median(Insurance_by_ID$PolicyDuration_Months)
 
+x = c("class1", "class2", "class3", 
+                  "class4", "class5", "class6", 
+                  "class7", "class8", "class9", 
+                  "class10", "class11", "class12",
+                  "class13","class14", "class15")
+
 Claims_by_class <- Commercial %>%
   group_by(vehicle_class) %>%
+  rename(vehicle_class)
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
-
 
 
 
@@ -94,7 +100,8 @@ PH_per_state
 #has claims as a log amount (so values aren't too far apart)
 total_claims_perMonth <- Commercial %>% 
   group_by(accident_month) %>%
-  summarise(Claims_every_AccMonth = sum(na.omit(total_claims_cost)))
+  summarise(Claims_every_AccMonth = sum(na.omit(total_claims_cost)),
+            No_claims = sum(na.omit(total_claims_cost)*0 +1))
 
 
 Claims_per_month <- total_claims_perMonth %>% 
@@ -102,7 +109,8 @@ Claims_per_month <- total_claims_perMonth %>%
 
 Quarterly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%
-  summarise(Total_QClaim = sum(Claims_every_AccMonth))
+  summarise(Total_QClaim = sum(Claims_every_AccMonth),
+            No_claims = sum(No_claims))
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
 ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
@@ -145,4 +153,13 @@ Unemployment$Quarter <- as.yearqtr(Unemployment$Quarter)
 plot(Unemployment$Quarter, Unemployment$Rate)
 lines(Unemployment$Quarter, Unemployment$Rate)
 cor.test(Unemployment$Rate, Quarterly_claim_freq1$Total_Q_claim_no)
+
+
+p <- ggplot(obs, aes(x = Timestamp))
+p <- p + geom_line(aes(y = air_temp, colour = "Temperature"))
+
+#MAYBE
+Violin <- Commercial[!is.na(total_claims_cost),]
+ggplot(Violin)+
+  geom_violin(width = 2, aes(x = vehicle_class, y=log(total_claims_cost)))
 
