@@ -89,13 +89,28 @@ Quarterly_claims <- Claims_per_month %>%
   group_by(accident_month) %>%
   summarise(Total_QClaim = sum(Claims_every_AccMonth))
 
-
-                                                                                 
-
-
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
 ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
-     geom_line()  
+  geom_line() 
+
+#Claims each Quarter
+Quarterly_claim_Freq <- Commercial %>% 
+  group_by(accident_month) %>%
+  summarise(Claims_no = sum(!is.na(total_claims_cost)))
+
+Claim_freq_Quarter <- Quarterly_claim_Freq %>% 
+  mutate(Accident_Quarter = as.yearqtr(accident_month, format = "%Y-%m-%d"))
+
+Quarterly_claim_freq1 <- Claim_freq_Quarter %>%
+  group_by(Accident_Quarter) %>%
+  summarise(Total_Q_claim_no = sum(Claims_no))
+
+#Actual plot --> can be compared to the movement 
+ggplot(Quarterly_claim_freq1, aes(x = Accident_Quarter, y = Total_Q_claim_no)) + 
+  geom_line()                                                                      
+
+
+ 
      
 
 
