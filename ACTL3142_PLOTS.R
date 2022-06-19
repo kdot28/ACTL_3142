@@ -24,6 +24,8 @@ PH_per_state <- table(Insurance_by_ID$State)
 
 
 
+
+
 #QUARTERLY CLAIM AMOUNT
 ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
   geom_line(colour = "darkorchid1", size = 1.2 )+
@@ -38,7 +40,7 @@ ggplot(Inf_claim_data)+
 
 
 
-#INFLATION + CLAIMS (QUARTERLY)
+#INFLATION + CLAIMS (QUARTERLY)  +THIS DONT WORK YET+
 Inf_claim_data <- Quarterly_claims %>%
   mutate(rate = Inflation$Percentage.Change) %>%
   mutate(unem_rate = Unemployment$Rate)
@@ -51,7 +53,19 @@ ggplot(Inf_claim_data) +
   scale_y_continuous("Rate (%)", sec.axis = sec_axis( trans=~.*10, name="Second Axis"))
 
 
+#SUM INSURED BY MONTH
+month <- Commercial%>%
+  group_by(accident_month) %>%
+  summarise(amt = mean(sum_insured))
 
+month$accident_month<- as.Date(month$accident_month)
+
+ggplot(month)+
+  geom_line(aes(x = accident_month, y = amt), stat = "identity")+
+  labs(x = "Month", y = "Total Sum Insured",
+       title = "Total Sum Insured per Month")
+
+  
 
 
 
