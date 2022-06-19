@@ -13,8 +13,8 @@ Commercial <- read.csv("ACTL3142Data.csv")
 attach(Commercial)
 Inflation <- read.csv("Inflation.csv", header = TRUE)
 attach(Inflation)
-Inflation$Quarter <- as.Date(Inflation$Quarter)
-Inflation$Percentage.Change <- as.numeric(sub("%", "", Inflation$Percentage.Change))
+Inflation$Quarter <- as.Date(Inflation$Quarter, format = "%d-%m-%Y")
+Inflation$Percentage.Change <- as.numeric(Percentage.Change)
 plot(Inflation$Quarter, Inflation$Percentage.Change)
 
 #changing qualitative variables to factors
