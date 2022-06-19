@@ -90,7 +90,7 @@ Claims_per_month$accident_month = as.yearqtr(Claims_per_month$accident_month)
 ggplot(Claims_per_month, aes(x = accident_month, y = Claims_per_quarter)) + 
      geom_line() + 
      scale_x_date(date_labels = "%Y-%m")
-
+#yes
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
