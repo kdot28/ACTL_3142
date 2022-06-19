@@ -80,25 +80,21 @@ total_claims_perMonth <- Commercial %>%
   group_by(accident_month) %>%
   summarise(Claims_every_AccMonth = sum(na.omit(total_claims_cost)))
 
-#manipulation for the plot (dates on the x-axis)
-Claims_per_month <- total_claims_perMonth 
-Claims_per_month$accident_month <- as.Date(Claims_per_month$accident_month)
-Claims_per_month <- Claims_per_month[order(Claims_per_month$accident_month), ]
-Claims_per_month$accident_month = as.yearqtr(Claims_per_month$accident_month)
+
+Claims_per_month <- total_claims_perMonth %>% 
+  mutate(accident_month = as.yearqtr(accident_month, format = "%Y-%m-%d"))
+
+Quarterly_claims <- Claims_per_month %>% 
+  group_by(accident_month) %>%
+  summarise(Total_QClaim = sum(Claims_every_AccMonth))
+                                                                                 
+
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
 ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) + 
      geom_line() + 
      scale_x_date(date_labels = "%Y-%m")
-#yes
 
-quarterly <- Commercial %>%
-  group_by(Quarter = accident_month) %>%
-  summarise(Claim_amount = sum(na.omit(total_claims_cost)))
-
-
-newtable <- quarterly %>%
-  group_by(as.yearqtr(Quarter))
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
