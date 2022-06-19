@@ -117,10 +117,6 @@ ggplot(Quarterly_claim_freq1, aes(x = Accident_Quarter, y = Total_Q_claim_no)) +
   geom_line()                                                                      
 
 
- 
-     
-
-
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
 #could also compare number of accidents given the year of production of each vehicle 
