@@ -6,13 +6,12 @@ library(readr)
 library(tidyselect)
 library(usethis)
 library(skimr)
-library(zoo)
 
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
 attach(Commercial)
 
-#changing qualitative variables to different classes (as per requirement)
+#changing qualitative variables to factors
 vehicle_class<-as.character(vehicle_class)
 risk_state_name<-as.factor(risk_state_name)
 claim_loss_date<-as.Date(claim_loss_date)
@@ -44,6 +43,7 @@ Claims_by_class <- Commercial %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
 
+
 #Data Visualisation
 
 #Barplot of number of claims/class (add title etc.)
@@ -74,23 +74,30 @@ PH_per_state <- table(Insurance_by_ID$State)
 PH_per_state
 
 #Trying to plot total claims cost/ per quarter (compare it with Australia's inflationary data)
-#has claims as a log amount (so values aren't too far apart)
-total_claims_perQ <- Commercial %>% 
-  group_by(accident_month) %>%
-  summarise(Claims_per_quarter = (sum(na.omit(total_claims_cost))))
 
+#has claims as a log amount (so values aren't too far apart)
+total_claims_perMonth <- Commercial %>% 
+  group_by(accident_month) %>%
+  summarise(Claims_every_AccMonth = log(sum(na.omit(total_claims_cost))))
 
 #manipulation for the plot (dates on the x-axis)
-Claims_per_month <- total_claims_perQ 
+Claims_per_month <- total_claims_perMonth 
 Claims_per_month$accident_month <- as.Date(Claims_per_month$accident_month)
 Claims_per_month <- Claims_per_month[order(Claims_per_month$accident_month), ]
-Claims_per_month$accident_month = as.yearqtr(Claims_per_month$accident_month)
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
-ggplot(Claims_per_month, aes(x = accident_month, y = Claims_per_quarter)) + 
+ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) + 
      geom_line() + 
      scale_x_date(date_labels = "%Y-%m")
 #yes
+
+quarterly <- Commercial %>%
+  group_by(Quarter = accident_month) %>%
+  summarise(Claim_amount = sum(na.omit(total_claims_cost)))
+
+
+newtable <- quarterly %>%
+  group_by(as.yearqtr(Quarter))
 
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
@@ -101,3 +108,4 @@ ggplot(Claims_per_month, aes(x = accident_month, y = Claims_per_quarter)) +
 
 #can look ar externals as well (e.g. inflation rate, and thus relate it to insurance amount and frequency
 #note: both are to be considered as mentioned in the assignment brief)
+
