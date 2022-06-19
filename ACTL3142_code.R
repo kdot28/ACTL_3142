@@ -84,6 +84,7 @@ total_claims_perMonth <- Commercial %>%
 Claims_per_month <- total_claims_perMonth 
 Claims_per_month$accident_month <- as.Date(Claims_per_month$accident_month)
 Claims_per_month <- Claims_per_month[order(Claims_per_month$accident_month), ]
+Claims_per_month$accident_month = as.yearqtr(Claims_per_month$accident_month)
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
 ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) + 
