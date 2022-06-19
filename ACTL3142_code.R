@@ -13,9 +13,9 @@ Commercial <- read.csv("ACTL3142Data.csv")
 attach(Commercial)
 Inflation <- read.csv("Inflation.csv", header = TRUE)
 attach(Inflation)
-Inflation$ï..Quarter <- as.factor(Inflation$ï..Quarter)
+Inflation$Quarter <- as.Date(Inflation$Quarter)
 Inflation$Percentage.Change <- as.numeric(sub("%", "", Inflation$Percentage.Change))
-plot(Inflation$ï..Quarter, Inflation$Percentage.Change)
+plot(Inflation$Quarter, Inflation$Percentage.Change)
 
 #changing qualitative variables to factors
 vehicle_class<-as.character(vehicle_class)
