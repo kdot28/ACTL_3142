@@ -6,7 +6,6 @@ library(readr)
 library(tidyselect)
 library(usethis)
 library(skimr)
-library(zoo)
 
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
@@ -44,6 +43,7 @@ Claims_by_class <- Commercial %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
 
+
 #Data Visualisation
 
 #Barplot of number of claims/class (add title etc.)
@@ -78,7 +78,7 @@ PH_per_state
 #has claims as a log amount (so values aren't too far apart)
 total_claims_perMonth <- Commercial %>% 
   group_by(accident_month) %>%
-  summarise(Claims_every_AccMonth = (sum(na.omit(total_claims_cost))))
+  summarise(Claims_every_AccMonth = log(sum(na.omit(total_claims_cost))))
 
 #manipulation for the plot (dates on the x-axis)
 Claims_per_month <- total_claims_perMonth 
@@ -91,6 +91,14 @@ ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) +
      scale_x_date(date_labels = "%Y-%m")
 
 
+quarterly <- Commercial %>%
+  group_by(Quarter = accident_month) %>%
+  summarise(Claim_amount = sum(na.omit(total_claims_cost)))
+
+
+newtable <- quarterly %>%
+  group_by(as.yearqtr(Quarter))
+
 #could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
 
 #could also compare number of accidents given the year of production of each vehicle 
@@ -100,3 +108,4 @@ ggplot(Claims_per_month, aes(x = accident_month, y = Claims_every_AccMonth)) +
 
 #can look ar externals as well (e.g. inflation rate, and thus relate it to insurance amount and frequency
 #note: both are to be considered as mentioned in the assignment brief)
+
