@@ -5,7 +5,7 @@ ggplot(Claims_by_class) +
   geom_bar(aes(x=reorder(vehicle_class, -No_claims), y= No_claims, fill = No_claims), stat = "identity") +
   labs(x = "Vehicle Class", y = "Number of Claims",
        title = "Number of Claims per Vehicle Class")+
-  scale_fill_gradient(low = "green", high = "red")
+  scale_fill_gradient(low = "green", high = "orange")
 
 
 #AVE COST PER CLASS
@@ -62,8 +62,8 @@ month$accident_month<- as.Date(month$accident_month)
 
 ggplot(month)+
   geom_line(aes(x = accident_month, y = amt), stat = "identity")+
-  labs(x = "Month", y = "Total Sum Insured",
-       title = "Total Sum Insured per Month")
+  labs(x = "Month", y = "Average Sum Insured",
+       title = "Average Sum Insured per Month")
 
 #Average Claim Cost per State
 
