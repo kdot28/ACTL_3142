@@ -25,7 +25,6 @@ PH_per_state <- table(Insurance_by_ID$State)
 library(data.table)
 PH_per_state
 
-matrix <- 
 
 #QUARTERLY CLAIM AMOUNT
 ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
