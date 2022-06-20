@@ -48,10 +48,12 @@ Inf_claim_data <- Quarterly_claims %>%
   mutate(rate = Inflation$Percentage.Change) %>%
   mutate(unem_rate = Unemployment$Rate)
 
-Inf_claim_data$Total_QClaim <- as.numeric(Inf_claim_data$Total_QClaim)
+
+
+plot(Inf_claim_data$accident_month, Inf_claim_data$Total_QClaim)
 
 ggplot(Inf_claim_data) + 
-  geom_line(x= accident_month, y = log(Inf_claim_data$Total_QClaim))+
+  geom_line(x= accident_month, y = Inf_claim_data$Total_QClaim)+
   geom_line(y = Inf_claim_data$rate)+
   scale_y_continuous("Rate (%)", sec.axis = sec_axis( trans=~.*10, name="Second Axis"))
 
