@@ -12,8 +12,8 @@ ggplot(Claims_by_class) +
 ggplot(Claims_by_class) + 
   geom_bar(aes(x=reorder(vehicle_class, -Ave_Claim_Amt), y=Ave_Claim_Amt, fill = Ave_Claim_Amt), 
                   stat = "identity")+
+  theme_grey()+
   scale_fill_gradient(low = "green", high = "orange")+
-  theme_gray()+
   labs(x = "Vehicle Class", y = "Average Claim Amount",
        title = "Average Claim Amount per Vehicle Class")
   
@@ -22,13 +22,14 @@ ggplot(Claims_by_class) +
 #POLICYHOLDERS PER STATE (TABLE)
 PH_per_state <- table(Insurance_by_ID$State)
 
+library(data.table)
+PH_per_state
 
-
-
+matrix <- 
 
 #QUARTERLY CLAIM AMOUNT
 ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
-  geom_line(colour = "darkorchid1", size = 1.2 )+
+  geom_line(colour = "black", size = 0.8 )+
   labs(x = "Quarter", y = "Total Amount of Claims",
        title = "Total Claim Amount per Quarter")+
   theme_gray()
@@ -36,7 +37,10 @@ ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) +
 #QUARTERLY NUMBER OF CLAIMS
 ggplot(Inf_claim_data)+
   geom_line(aes(x = accident_month, y=No_claims), 
-            stat = "identity")
+            stat = "identity") + 
+  labs(x = "Quarter", y = "Total Number of Claims",
+       title = "Total Number of Claims per Quarter")+
+  theme_gray()
 
 
 
