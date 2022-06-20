@@ -10,7 +10,7 @@ library(zoo)
 
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
-attach(Commercial)
+attach(Commercial) 
 
 Inflation <- read.csv("Inflation.csv", header = TRUE)
 attach(Inflation)
@@ -60,7 +60,6 @@ x = c("class1", "class2", "class3",
 
 Claims_by_class <- Commercial %>%
   group_by(vehicle_class) %>%
-  rename(vehicle_class)
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
 
@@ -163,3 +162,10 @@ Violin <- Commercial[!is.na(total_claims_cost),]
 ggplot(Violin)+
   geom_violin(width = 2, aes(x = vehicle_class, y=log(total_claims_cost)))
 
+#Costliest States 
+
+States <- Commercial %>%
+  group_by(risk_state_name) %>% 
+  summarise(Sum_per_vehicle = (sum(na.omit(total_claims_cost)))/sum(!is.na(total_claims_cost)))
+
+class(risk_state_name)

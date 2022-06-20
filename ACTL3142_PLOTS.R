@@ -65,6 +65,15 @@ ggplot(month)+
   labs(x = "Month", y = "Total Sum Insured",
        title = "Total Sum Insured per Month")
 
+#Average Claim Cost per State
+
+ggplot(States) + 
+  geom_bar(aes(x=reorder(risk_state_name, -Sum_per_vehicle), y = Sum_per_vehicle, fill = Sum_per_vehicle),
+                stat = "identity") + 
+  scale_fill_gradient(low = "green", high = "orange")+
+  theme_gray()+
+  labs(x = "State Name", y = "Average Claim Cost",
+       title = "Average Claim Cost per State", fill = "Average Claim Cost")
   
 
 
