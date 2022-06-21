@@ -165,8 +165,7 @@ ggplot(Violin, aes(x = vehicle_class, y=log(total_claims_cost)))+
                geom = "crossbar",
                color = "red", width = 0.5)+
   labs(x = "Vehicle Class", y = "log of Number of Claims",
-       title = "Log of claims per Vehicle Class")+
-  scale_fill_gradient(low = "green", high = "orange")
+       title = "Log of claims per Vehicle Class")
 
 #Costliest States 
 
