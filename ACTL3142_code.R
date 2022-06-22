@@ -159,8 +159,13 @@ p <- p + geom_line(aes(y = air_temp, colour = "Temperature"))
 
 #MAYBE
 Violin <- Commercial[!is.na(total_claims_cost),]
-ggplot(Violin)+
-  geom_violin(width = 2, aes(x = vehicle_class, y=log(total_claims_cost)))
+ggplot(Violin, aes(x = vehicle_class, y=log(total_claims_cost)))+
+  geom_violin(width = 2)+
+  stat_summary(fun = "mean",
+               geom = "crossbar",
+               color = "red", width = 0.5)+
+  labs(x = "Vehicle Class", y = "log of Number of Claims",
+       title = "Log of claims per Vehicle Class")
 
 #Costliest States 
 
