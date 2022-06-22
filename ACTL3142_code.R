@@ -171,3 +171,7 @@ States <- Commercial %>%
 State_Claims <- Commercial %>% 
   group_by(risk_state_name) %>% 
   summarise(Claims_per_state = sum(!is.na(total_claims_cost)))
+
+Number_in_each_class <- Commercial %>%
+  group_by(vehicle_class) %>%
+  summarise(Each_class = sum(unique(policy_id)) )
