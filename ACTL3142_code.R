@@ -16,9 +16,9 @@ Inflation <- read.csv("Inflation.csv", header = TRUE)
 attach(Inflation)
 
 
-Inflation$ï..Quarter <- as.yearqtr(as.Date(Inflation$ï..Quarter))
+Inflation$Quarter <- as.yearqtr(as.Date(Inflation$ï..Quarter))
 Inflation$Percentage.Change <- as.numeric(sub("%", "", Inflation$Percentage.Change))
-plot(Inflation$ï..Quarter, Inflation$Percentage.Change)
+plot(Inflation$Quarter, Inflation$Percentage.Change)
 
 Inflation$Quarter <- as.Date(Inflation$Quarter, format = "%d-%m-%Y")
 Inflation$Percentage.Change <- as.numeric(Percentage.Change)
@@ -108,11 +108,11 @@ Claims_per_month <- total_claims_perMonth %>%
 
 Quarterly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%
-  summarise(Total_QClaim = sum(Claims_every_AccMonth),
-            No_claims = sum(No_claims))
+  summarise(Total_QClaim = (sum(Claims_every_AccMonth)),
+            No_claims = sum(No_claims), Average_claims = Total_QClaim/No_claims)
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
-ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
+ggplot(Quarterly_claims, aes(x = accident_month, y = Average_claims)) + 
   geom_line() 
 
 #Claims each Quarter

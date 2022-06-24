@@ -45,12 +45,11 @@ ggplot(Inf_claim_data)+
 
 #INFLATION + CLAIMS (QUARTERLY)  +THIS DONT WORK YET+
 Inf_claim_data <- Quarterly_claims %>%
-  mutate(rate = Inflation$Percentage.Change) %>%
-  mutate(unem_rate = Unemployment$Rate)
+  mutate(rate = Inflation$Percentage.Change)
 
 
 
-plot(Inf_claim_data$accident_month, Inf_claim_data$Total_QClaim)
+plot(Inf_claim_data$accident_month, Inf_claim_data$rate)
 
 ggplot(Inf_claim_data) + 
   geom_line(x= accident_month, y = Inf_claim_data$Total_QClaim)+
