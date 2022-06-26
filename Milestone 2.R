@@ -16,7 +16,8 @@
 
 # https://docplayer.net/1238431-Assessing-inflation-risk-in-non-life-insurance.html
 
-Commercial_new
+Commercial_new <- Commercial %>%
+  na.omit(Commercial$total_claims_cost)
 
 Petrol <- read.csv("Petrol_data.csv", header = TRUE)
 
