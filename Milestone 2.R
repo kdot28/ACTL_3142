@@ -16,3 +16,6 @@
 # https://docplayer.net/1238431-Assessing-inflation-risk-in-non-life-insurance.html
 
 Commercial_new
+
+Petrol <- read.csv("Petrol_data.csv", header = TRUE)
+
