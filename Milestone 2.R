@@ -11,6 +11,7 @@
 #respective line of business (comprehensive commercial vehicle insurnace for us)
 #We arent gonna do stochastic stuff to fully predict ig?
 #we can do GLM instead of multiple linear as well, with gamma as the dist for residuals
+
 #Need to look into claims freq now :)
 
 # https://docplayer.net/1238431-Assessing-inflation-risk-in-non-life-insurance.html
