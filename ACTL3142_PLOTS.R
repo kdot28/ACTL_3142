@@ -34,18 +34,27 @@ ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) +
   theme_gray()
 
 #QUARTERLY NUMBER OF CLAIMS
-ggplot(Inf_claim_data)+
+Q_claim_data <- Quarterly_claims %>%
+  mutate(rate = Inflation$Percentage.Change)
+
+ggplot(Quarterly_claims)+
   geom_line(aes(x = accident_month, y=No_claims), 
             stat = "identity") + 
   labs(x = "Quarter", y = "Total Number of Claims",
        title = "Total Number of Claims per Quarter")+
   theme_gray()
 
+ggplot(Claims_per_month)+
+  geom_line(aes(x = accident_month, y=Number_of_claims), 
+            stat = "identity") + 
+  labs(x = "Accident Month", y = "Total Number of Claims",
+       title = "Total Number of Claims per Quarter")+
+  theme_gray()
 
+plot(Claims_per_month$accident_month, Claims_per_month$Number_of_claims)
 
 #INFLATION + CLAIMS (QUARTERLY)  +THIS DONT WORK YET+
-Inf_claim_data <- Quarterly_claims %>%
-  mutate(rate = Inflation$Percentage.Change)
+
 
 
 
