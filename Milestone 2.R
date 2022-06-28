@@ -16,6 +16,8 @@
 
 # https://docplayer.net/1238431-Assessing-inflation-risk-in-non-life-insurance.html
 
+library(dplyr)
+
 Commercial_new <- Commercial %>%
   na.omit(Commercial$total_claims_cost)
 
