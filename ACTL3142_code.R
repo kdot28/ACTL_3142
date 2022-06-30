@@ -103,8 +103,12 @@ total_claims_perMonth <- Commercial %>%
             No_claims = sum(na.omit(total_claims_cost)*0 +1))
 
 
-Claims_per_month <- total_claims_perMonth %>% 
-  mutate(accident_month = as.yearqtr(accident_month, format = "%Y-%m-%d"))
+Claims_per_month <- Commercial %>%
+  na.omit(total_claims_cost) %>%
+  group_by(accident_month) %>%
+  summarise(Number_of_claims = n(), Average_claim_size = mean(total_claims_cost),
+            Total_claims = sum(total_claims_cost))
+Claims_per_month$accident_month<-as.Date(Claims_per_month$accident_month)
 
 Quarterly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%

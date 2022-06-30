@@ -34,18 +34,41 @@ ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) +
   theme_gray()
 
 #QUARTERLY NUMBER OF CLAIMS
-ggplot(Inf_claim_data)+
+Q_claim_data <- Quarterly_claims %>%
+  mutate(rate = Inflation$Percentage.Change)
+
+ggplot(Quarterly_claims)+
   geom_line(aes(x = accident_month, y=No_claims), 
             stat = "identity") + 
   labs(x = "Quarter", y = "Total Number of Claims",
        title = "Total Number of Claims per Quarter")+
   theme_gray()
 
+#Total Number of Claims per Month
+ggplot()+
+  geom_line(dat = Claims_per_month, aes(x = accident_month, y=Number_of_claims), 
+            stat = "identity") + 
+  labs(x = "Accident Month", y = "Total Number of Claims",
+       title = "Total Number of Claims per Month")+
+  theme_gray()
 
+#Average Claim Size per Month
+ggplot()+
+  geom_rect(data =Claims_per_month, aes(xmin = as.Date("2016-07-31"), ymin = -Inf, xmax = as.Date("2020-02-29"), ymax = Inf,
+                                        fill = "111111111111111111"))+
+  geom_rect(data =Claims_per_month, aes(xmin = as.Date("2020-02-29"), ymin = -Inf, xmax = as.Date("2021-06-30"), ymax = Inf,
+                fill = "222222222222222222"))+
+
+  geom_line(data = Claims_per_month,aes(x = accident_month, y=Average_claim_size), 
+            stat = "identity") + 
+  scale_fill_brewer(palette = 'Blues', name ='')+
+  labs(x = "Accident Month", y = "Average Claim Size",
+       title = "Average Claim Size per Month")
+
+plot(Claims_per_month$accident_month, Claims_per_month$Number_of_claims)
 
 #INFLATION + CLAIMS (QUARTERLY)  +THIS DONT WORK YET+
-Inf_claim_data <- Quarterly_claims %>%
-  mutate(rate = Inflation$Percentage.Change)
+
 
 
 
