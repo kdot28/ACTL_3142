@@ -16,7 +16,7 @@ Inflation <- read.csv("Inflation.csv", header = TRUE)
 attach(Inflation)
 
 
-Inflation$Quarter <- as.yearqtr(as.Date(Inflation$ï..Quarter))
+Inflation$Quarter <- as.yearqtr(as.Date(Inflation$Quarter))
 Inflation$Percentage.Change <- as.numeric(sub("%", "", Inflation$Percentage.Change))
 plot(Inflation$Quarter, Inflation$Percentage.Change)
 
@@ -115,16 +115,20 @@ total_claims_perMonth <- Commercial %>%
             No_claims = sum(na.omit(total_claims_cost)*0 +1))
 
 
-Claims_per_month <- total_claims_perMonth %>% 
-  mutate(accident_month = as.yearqtr(accident_month, format = "%Y-%m-%d"))
+Claims_per_month <- Commercial %>%
+  na.omit(total_claims_cost) %>%
+  group_by(accident_month) %>%
+  summarise(Number_of_claims = n(), Average_claim_size = mean(total_claims_cost),
+            Total_claims = sum(total_claims_cost))
+Claims_per_month$accident_month<-as.Date(Claims_per_month$accident_month)
 
 Quarterly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%
-  summarise(Total_QClaim = (sum(Claims_every_AccMonth)),
-            No_claims = sum(No_claims), Average_claims = Total_QClaim/No_claims)
+  summarise(Total_QClaim = sum(Claims_every_AccMonth),
+            No_claims = sum(No_claims))
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
-ggplot(Quarterly_claims, aes(x = accident_month, y = Average_claims)) + 
+ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
   geom_line() 
 
 #Claims each Quarter
@@ -173,3 +177,19 @@ State_Claims <- Commercial %>%
 Number_in_each_class <- Commercial %>%
   group_by(vehicle_class) %>%
   summarise(Each_class = sum(unique(policy_id)) )
+
+
+
+
+avg.claim.size.per.qtr <- (Quarterly_claims$Total_QClaim/Quarterly_claims$No_claims)
+Quarterly_claims$avg.claim.size.per.qtr <- avg.claim.size.per.qtr
+
+Inflation[, "cum_inflation"] <- cumsum(Inflation$Percentage.Change)
+  
+set.seed(1)
+train <- sample(1226044,919533)
+lm.cum <- lm(Quarterly_claims$avg.claim.size.per.qtr ~ Inflation$cum_inflation, subset=train) 
+summary(lm.cum)
+mean((Quarterly_claims$avg.claim.size.per.qtr - predict(lm.cum, Quarterly_claims))[-train]^2)
+dad <- plot(Quarterly_claims$avg.claim.size.per.qtr ~ Inflation$cum_inflation, subset=train)
+
