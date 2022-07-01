@@ -94,9 +94,21 @@ TWOSTATEENTRY <- Commercial[policy_id == 32422,]
 PH_per_state <- table(Insurance_by_ID$State)
 PH_per_state
 
-#Trying to plot total claims cost/ per quarter (compare it with Australia's inflationary data)
+#Average sum insured/quarter 
+Sum_insured_total <- Commercial %>%
+  group_by(accident_month) %>% 
+  summarise(Total_sum_insured = sum(sum_insured),
+            No_of_vehicles = sum((sum_insured)*0+1))
 
-#has claims as a log amount (so values aren't too far apart)
+Sum_insured_quarterly_permonth <- Sum_insured_total %>%
+  mutate(Sum_insured_quarter = as.yearqtr(accident_month, format = "%Y-%m-%d"))
+
+Sum_insured_quarterly <- Sum_insured_quarterly_permonth %>%
+  group_by(Sum_insured_quarter) %>%
+  summarise(Total_Qsuminsured = (sum(Total_sum_insured)),
+            No_of_vehiclesQ = sum(No_of_vehicles), 
+            Avg_sum_insured = Total_Qsuminsured/No_of_vehiclesQ)
+#Trying to plot total claims cost/ per quarter (compare it with Australia's inflationary data)
 total_claims_perMonth <- Commercial %>% 
   group_by(accident_month) %>%
   summarise(Claims_every_AccMonth = sum(na.omit(total_claims_cost)),
@@ -147,25 +159,6 @@ ggplot(Quarterly_claim_freq1, aes(x = Accident_Quarter, y = Total_Q_claim_no)) +
 #UNEMPLOYMENT
 #https://www.abs.gov.au/articles/historical-charts-august-1966-may-2022
 
-Unemployment <- read.csv("Unemployment.csv")
-Unemployment$Quarter <- as.yearqtr(Unemployment$Quarter)
-plot(Unemployment$Quarter, Unemployment$Rate)
-lines(Unemployment$Quarter, Unemployment$Rate)
-cor.test(Unemployment$Rate, Quarterly_claim_freq1$Total_Q_claim_no)
-
-
-p <- ggplot(obs, aes(x = Timestamp))
-p <- p + geom_line(aes(y = air_temp, colour = "Temperature"))
-
-#MAYBE
-Violin <- Commercial[!is.na(total_claims_cost),]
-ggplot(Violin, aes(x = vehicle_class, y=log(total_claims_cost)))+
-  geom_violin(width = 2)+
-  stat_summary(fun = "mean",
-               geom = "crossbar",
-               color = "red", width = 0.5)+
-  labs(x = "Vehicle Class", y = "log of Number of Claims",
-       title = "Log of claims per Vehicle Class")
 
 #Costliest States 
 
