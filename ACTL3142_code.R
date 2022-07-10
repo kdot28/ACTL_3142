@@ -108,6 +108,7 @@ Sum_insured_quarterly <- Sum_insured_quarterly_permonth %>%
   summarise(Total_Qsuminsured = (sum(Total_sum_insured)),
             No_of_vehiclesQ = sum(No_of_vehicles), 
             Avg_sum_insured = Total_Qsuminsured/No_of_vehiclesQ)
+
 #Trying to plot total claims cost/ per quarter (compare it with Australia's inflationary data)
 total_claims_perMonth <- Commercial %>% 
   group_by(accident_month) %>%
@@ -125,7 +126,7 @@ Claims_per_month$accident_month<-as.Date(Claims_per_month$accident_month)
 Quarterly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%
   summarise(Total_QClaim = sum(Claims_every_AccMonth),
-            No_claims = sum(No_claims))
+            No_claims = sum(No_claims), Average_claim = Total_QClaim/No_claims)
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
 ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
@@ -193,3 +194,12 @@ summary(lm.cum)
 mean((Quarterly_claims$avg.claim.size.per.qtr - predict(lm.cum, Quarterly_claims))[-train]^2)
 dad <- plot(Quarterly_claims$avg.claim.size.per.qtr ~ Inflation$cum_inflation, subset=train)
 
+
+##STORYWALL - KARAN (GLM)
+
+GLM_df <- cbind(Quarterly_claims, Sum_insured_quarterly)
+
+glm_1 <- glm(Average_claim ~ Avg_sum_insured, family = "Gamma"(link = "log"), data = GLM_df)
+summary(glm_1)
+prediction <- predict.glm(glm_1)
+plot(prediction)
