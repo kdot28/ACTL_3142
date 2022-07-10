@@ -11,7 +11,9 @@ library(tidyselect)
 library(usethis)
 library(skimr)
 library(zoo)
-
+library(caTools)
+library(caret)
+library(boot)
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
 
@@ -178,6 +180,9 @@ pls_work <- glm(Average_claim_quarter ~ Avg_sum_insured + CPI + Quarterly.Change
                 family = gaussian(link = "log"))
 summary(pls_work)
 
-toink <- glm(total_claims_cost ~ vehicle_class, 
-              data = Commercial_new, family = Gamma(link = "log"))
+
+#JUST INTERNAL VARIABLES
+toink <- glm(total_claims_cost ~ sum_insured,
+              data = train, family = Gamma(link = "log"))
 summary(toink)
+
