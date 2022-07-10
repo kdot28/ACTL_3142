@@ -154,7 +154,9 @@ Number_in_each_class <- Commercial %>%
 
 
 Commercial_new <- Commercial %>%
-  na.omit(Commercial$total_claims_cost)
+  na.omit(Commercial$total_claims_cost) %>% filter(total_claims_cost > 0)
+
+
 
 # tranport CPI source : https://www.fxempire.com/macro/australia/cpi-transportation
 # CPI + fuel movement source: 
@@ -169,12 +171,13 @@ JPY_AUD <- read.csv("JPY_AUD.csv", header = T)
 # Attaching them to Quarterly Claims severity and frequency (Quarterly Claims and 
 # Quarterly claim freq 1) --> for easy GLM later on
 
-GLM_data <- cbind(Quarterly_claims, CPI, Fuel_movement, Transport_CPI, JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
+GLM_data1 <- cbind(Quarterly_claims, CPI, Fuel_movement, Transport_CPI, JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
 colnames(GLM_data) <- c("Accident_Quarter", "Average_claim_quarter", "CPI", "Quarterly.Change", "Transport.CPI", "Exchange.Rate", "Avg_sum_insured")
 
 pls_work <- glm(Average_claim_quarter ~ Avg_sum_insured + CPI + Quarterly.Change + Transport.CPI, data = GLM_data,
                 family = gaussian(link = "log"))
 summary(pls_work)
 
-
-
+toink <- glm(total_claims_cost ~ vehicle_class, 
+              data = Commercial_new, family = Gamma(link = "log"))
+summary(toink)
