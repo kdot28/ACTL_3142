@@ -183,6 +183,6 @@ summary(pls_work)
 
 #JUST INTERNAL VARIABLES
 toink <- glm(total_claims_cost ~ sum_insured,
-              data = train, family = Gamma(link = "log"))
+              data = Commercial_new, family = Gamma(link = "log"))
 summary(toink)
 
