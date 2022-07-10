@@ -12,19 +12,6 @@ library(zoo)
 Commercial <- read.csv("ACTL3142Data.csv") 
 attach(Commercial) 
 
-Inflation <- read.csv("Inflation.csv", header = TRUE)
-attach(Inflation)
-
-
-Inflation$Quarter <- as.yearqtr(as.Date(Inflation$Quarter))
-Inflation$Percentage.Change <- as.numeric(sub("%", "", Inflation$Percentage.Change))
-plot(Inflation$Quarter, Inflation$Percentage.Change)
-
-Inflation$Quarter <- as.Date(Inflation$Quarter, format = "%d-%m-%Y")
-Inflation$Percentage.Change <- as.numeric(Percentage.Change)
-plot(Inflation$Quarter, Inflation$Percentage.Change)
-
-
 #changing qualitative variables to factors
 vehicle_class<-as.character(vehicle_class)
 risk_state_name<-as.factor(risk_state_name)
@@ -63,36 +50,6 @@ Claims_by_class <- Commercial %>%
   summarise(No_claims = sum(!is.na(total_claims_cost)),
             Ave_Claim_Amt = mean(na.omit(total_claims_cost)))
 
-
-
-#Data Visualisation
-
-#Barplot of number of claims/class (add title etc.)
-No_claims_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y= No_claims)) + 
-  geom_bar(stat = "identity") 
-No_claims_vs_Class
-
-#Barplot of Avg claim cost/class (add title etc.)
-AveCost_vs_Class <- ggplot(Claims_by_class, aes(x=vehicle_class, y=Ave_Claim_Amt)) + 
-  geom_bar(stat = "identity") 
-AveCost_vs_Class
-
-#Barplot of No.cars per manufature year
-No_cars_manufacture_year <- ggplot(By_manufacture_year, aes(x= year_of_manufacture, y = No_vehicles)) + 
-  geom_bar(stat = "identity")
-No_cars_manufacture_year
-
-min(Commercial$year_of_manufacture)
-max(Commercial$year_of_manufacture)
-mean(Commercial$year_of_manufacture)
-
-
-# POLICY ID THAT HAS TWO STATES
-TWOSTATEENTRY <- Commercial[policy_id == 32422,]
-
-#Number of policyholders per state
-PH_per_state <- table(Insurance_by_ID$State)
-PH_per_state
 
 #Average sum insured/quarter 
 Sum_insured_total <- Commercial %>%
@@ -182,24 +139,7 @@ Number_in_each_class <- Commercial %>%
 
 
 
-avg.claim.size.per.qtr <- (Quarterly_claims$Total_QClaim/Quarterly_claims$No_claims)
-Quarterly_claims$avg.claim.size.per.qtr <- avg.claim.size.per.qtr
-
-Inflation[, "cum_inflation"] <- cumsum(Inflation$Percentage.Change)
-  
-set.seed(1)
-train <- sample(1226044,919533)
-lm.cum <- lm(Quarterly_claims$avg.claim.size.per.qtr ~ Inflation$cum_inflation, subset=train) 
-summary(lm.cum)
-mean((Quarterly_claims$avg.claim.size.per.qtr - predict(lm.cum, Quarterly_claims))[-train]^2)
-dad <- plot(Quarterly_claims$avg.claim.size.per.qtr ~ Inflation$cum_inflation, subset=train)
 
 
-##STORYWALL - KARAN (GLM)
 
-GLM_df <- cbind(Quarterly_claims, Sum_insured_quarterly)
 
-glm_1 <- glm(Average_claim ~ Avg_sum_insured, family = "Gamma"(link = "log"), data = GLM_df)
-summary(glm_1)
-prediction <- predict.glm(glm_1)
-plot(prediction)
