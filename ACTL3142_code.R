@@ -163,7 +163,7 @@ Commercial_new <- Commercial %>%
 CPI <- read.csv("CPI_1.csv", header = T)
 Fuel_movement <- read.csv("Automotive fuel Quarterly movement.csv", header = T)
 Transport_CPI <- read.csv("Transport CPI.csv", header = TRUE)
-
+JPY_AUD <- read.csv("JPY:AUD.csv", header = T)
 
 
 # Attaching them to Quarterly Claims severity and frequency (Quarterly Claims and 
