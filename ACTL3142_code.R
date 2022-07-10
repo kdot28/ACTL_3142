@@ -165,6 +165,7 @@ Fuel_movement <- read.csv("Automotive fuel Quarterly movement.csv", header = T)
 Transport_CPI <- read.csv("Transport CPI.csv", header = TRUE)
 
 
+
 # Attaching them to Quarterly Claims severity and frequency (Quarterly Claims and 
 # Quarterly claim freq 1) --> for easy GLM later on
 
