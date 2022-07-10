@@ -1,3 +1,7 @@
+# ------ MILESTONE 1 -------
+
+rm(list = ls())
+
 #Loading all the necessary packages
 library(ggplot2)
 library(dplyr)
@@ -10,15 +14,14 @@ library(zoo)
 
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
-attach(Commercial) 
 
 #changing qualitative variables to factors
-vehicle_class<-as.character(vehicle_class)
-risk_state_name<-as.factor(risk_state_name)
-claim_loss_date<-as.Date(claim_loss_date)
-term_start_date<-as.Date(term_start_date)
-term_expiry_date<-as.Date(term_expiry_date)
-accident_month <- as.Date(accident_month)
+Commercial$vehicle_class<-as.character(Commercial$vehicle_class)
+Commercial$risk_state_name<-as.factor(Commercial$risk_state_name)
+Commercial$claim_loss_date<-as.Date(Commercial$claim_loss_date)
+Commercial$term_start_date<-as.Date(Commercial$term_start_date)
+Commercial$term_expiry_date<-as.Date(Commercial$term_expiry_date)
+Commercial$accident_month <- as.Date(Commercial$accident_month)
 
 #Conducting basic data quality checking using skimr package
 
@@ -82,8 +85,14 @@ Claims_per_month$accident_month<-as.Date(Claims_per_month$accident_month)
 
 Quarterly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%
-  summarise(Total_QClaim = sum(Claims_every_AccMonth),
-            No_claims = sum(No_claims), Average_claim = Total_QClaim/No_claims)
+  mutate(Accident_Quarter = as.yearqtr(accident_month, format = "%Y-%m-%d")) %>%
+  summarise(Total_QClaim = sum(Total_claims),
+            No_claims = sum(Number_of_claims), Average_claim = Total_QClaim/No_claims) %>%
+ mutate(Accident_Quarter = as.yearqtr(accident_month, format = "%Y-%m-%d")) 
+
+Quarterly_claims <- Quarterly_claims %>%
+  group_by(Accident_Quarter) %>% 
+  summarise(Average_claim_quarter = sum(Average_claim))
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
 ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
@@ -105,23 +114,6 @@ Quarterly_claim_freq1 <- Claim_freq_Quarter %>%
 ggplot(Quarterly_claim_freq1, aes(x = Accident_Quarter, y = Total_Q_claim_no)) + 
   geom_line()                                                                      
 
-
-#could compare postcodes as well? e.g. a certain postcode in a certain state could have more accidents 
-
-#could also compare number of accidents given the year of production of each vehicle 
-
-#could also conduct state wise analysis (i.e. NSW vehicles are more prone to VIC vehicles 
-#i.e. have higher claims)
-
-#can look ar externals as well (e.g. inflation rate, and thus relate it to insurance amount and frequency
-#note: both are to be considered as mentioned in the assignment brief)
-
-
-
-#UNEMPLOYMENT
-#https://www.abs.gov.au/articles/historical-charts-august-1966-may-2022
-
-
 #Costliest States 
 
 States <- Commercial %>%
@@ -137,6 +129,44 @@ Number_in_each_class <- Commercial %>%
   summarise(Each_class = sum(unique(policy_id)) )
 
 
+# ----- MILESTONE 2 -----
+
+#gonna use new data frame coz other one too big (use select and mutate ig)
+#Gonna use CPI coz all papers say that (for claims severity)
+#for claims severity <- CPI, wage inflation, CPI medical services too (indices)
+#also CPI related to vehicles (indices)
+#internal factors <- class, sum insured...
+
+#Can use stepwise regression (multiple regression thing) to determine the main 
+#driving factors (i.e. forward selection and backward elimination)
+#fit the model on an AIC (week 5 content?) and choose the model that minimises AIC
+#The above analysis focuses on attributes that best characterises the cost of the 
+#respective line of business (comprehensive commercial vehicle insurnace for us)
+#We arent gonna do stochastic stuff to fully predict ig?
+#we can do GLM instead of multiple linear as well, with gamma as the dist for residuals
+
+#Need to look into claims freq now :)
+
+# https://docplayer.net/1238431-Assessing-inflation-risk-in-non-life-insurance.html
+
+
+# ----- MILESTONE 3 -----
+
+
+Commercial_new <- Commercial %>%
+  na.omit(Commercial$total_claims_cost)
+
+# tranport CPI source : https://www.fxempire.com/macro/australia/cpi-transportation
+# CPI + fuel movement source: 
+# https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release
+#Importing various CPI indices
+CPI <- read.csv("CPI_1.csv", header = T)
+Fuel_movement <- read.csv("Automotive fuel Quarterly movement.csv", header = T)
+Transport_CPI <- read.csv("Transport CPI.csv", header = TRUE)
+
+
+# Attaching them to Quarterly Claims severity and frequency (Quarterly Claims and 
+# Quarterly claim freq 1) --> for easy GLM later on
 
 
 
