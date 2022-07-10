@@ -160,17 +160,19 @@ Commercial_new <- Commercial %>%
 # CPI + fuel movement source: 
 # https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release
 #Importing various CPI indices
+
 CPI <- read.csv("CPI_1.csv", header = T)
 Fuel_movement <- read.csv("Automotive fuel Quarterly movement.csv", header = T)
 Transport_CPI <- read.csv("Transport CPI.csv", header = TRUE)
-JPY_AUD <- read.csv("JPY:AUD.csv", header = T)
-
+JPY_AUD <- read.csv("JPY_AUD.csv", header = T)
 
 # Attaching them to Quarterly Claims severity and frequency (Quarterly Claims and 
 # Quarterly claim freq 1) --> for easy GLM later on
 
-
-
+GLM_data <- cbind(Quarterly_claims, CPI, Fuel_movement, Transport_CPI, JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
+pls_work <- glm(Average_claim_quarter ~ Avg_sum_insured + CPI + Quarterly.Change + Transport.CPI, data = GLM_data,
+                family = gaussian(link = "log"))
+summary(pls_work)
 
 
 
