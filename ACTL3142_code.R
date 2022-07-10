@@ -170,6 +170,8 @@ JPY_AUD <- read.csv("JPY_AUD.csv", header = T)
 # Quarterly claim freq 1) --> for easy GLM later on
 
 GLM_data <- cbind(Quarterly_claims, CPI, Fuel_movement, Transport_CPI, JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
+colnames(GLM_data) <- c("Accident_Quarter", "Average_claim_quarter", "CPI", "Quarterly.Change", "Transport.CPI", "Exchange.Rate", "Avg_sum_insured")
+
 pls_work <- glm(Average_claim_quarter ~ Avg_sum_insured + CPI + Quarterly.Change + Transport.CPI, data = GLM_data,
                 family = gaussian(link = "log"))
 summary(pls_work)
