@@ -190,13 +190,40 @@ colnames(GLM_data1) <- c("Accident_Quarter", "Average_claim_quarter", "CPI",
 
 #Building the Severity Model (Internal Factors only)
 
-glm_sev <- glm(total_claims_cost ~ sum_insured + Vehicle_age +
-                 risk_state_name, family = Gamma(link = "log"), data = Commercial_new)
+glm_sev <- glm(total_claims_cost ~ sum_insured + Vehicle_age + policy_tenure, 
+                  family = Gamma(link = "log"), data = Commercial_new)
 summary(glm_sev)
+set.seed(1010)
+kfold_error_10 <- rep(0,10)
+for (i in 1:10) {glm_sev
+  kfold_error_10[i] <- cv.glm(Commercial_new, glm_sev, K = 10)$delta[1]
+}
+kfold_error_10
+mean((Commercial_new$total_claims_cost - predict.glm(glm_sev))^2)/10
+
+# ---- Frequency ----
+#Creating Claim frequency thing
+Claims_freq_1 <- Commercial_new %>% 
+  group_by(accident_month) %>%
+  summarise(Claims_no = sum(!is.na(total_claims_cost)), exposure_1 = sum(exposure))
+
+Claims_freq_2 <- Claims_freq_1 %>% 
+  mutate(Accident_Quarter = as.yearqtr(accident_month, format = "%Y-%m-%d"))
+
+Claims_freq_3 <- Claims_freq_2 %>%
+  group_by(Accident_Quarter) %>%
+  summarise(Claims_Frequency = sum(Claims_no))
 
 
+GLM_data2 <- cbind(Claims_freq_3, CPI, Fuel_movement, Transport_CPI,
+                   JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
+colnames(GLM_data2) <- c("Accident_Quarter", "Claims_Freq", "CPI", 
+                         "Quarterly.Change", "Transport.CPI", "Exchange.Rate", 
+                         "Avg_sum_insured")
 
-
-
-
+glm_freq <- glm(Claims_Freq ~  Transport.CPI +
+                 Avg_sum_insured + Exchange.Rate, 
+                 data = GLM_data2, 
+                 family = poisson(link = "log"))
+summary(glm_freq)
 
