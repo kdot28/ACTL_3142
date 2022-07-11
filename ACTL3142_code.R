@@ -156,7 +156,8 @@ Number_in_each_class <- Commercial %>%
 
 
 Commercial_new <- Commercial %>%
-  na.omit(Commercial$total_claims_cost) %>% filter(total_claims_cost > 0)
+  na.omit(Commercial$total_claims_cost) %>% filter(total_claims_cost > 0) %>%
+  mutate(Vehicle_age = 2022 - year_of_manufacture) %>% filter(Vehicle_age > 0)
 
 
 
@@ -173,16 +174,29 @@ JPY_AUD <- read.csv("JPY_AUD.csv", header = T)
 # Attaching them to Quarterly Claims severity and frequency (Quarterly Claims and 
 # Quarterly claim freq 1) --> for easy GLM later on
 
-GLM_data1 <- cbind(Quarterly_claims, CPI, Fuel_movement, Transport_CPI, JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
-colnames(GLM_data) <- c("Accident_Quarter", "Average_claim_quarter", "CPI", "Quarterly.Change", "Transport.CPI", "Exchange.Rate", "Avg_sum_insured")
 
-pls_work <- glm(Average_claim_quarter ~ Avg_sum_insured + CPI + Quarterly.Change + Transport.CPI, data = GLM_data,
-                family = gaussian(link = "log"))
-summary(pls_work)
+# ---- SEVERITY ----
+#gotta split the data ig
+
+#JUST INTERNAL VARIABLES (maybe Externals -> so have data frame ready)
+
+GLM_data1 <- cbind(Quarterly_claims, CPI, Fuel_movement, Transport_CPI, JPY_AUD, 
+                   Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
+colnames(GLM_data1) <- c("Accident_Quarter", "Average_claim_quarter", "CPI", 
+                         "Quarterly.Change", "Transport.CPI", "Exchange.Rate", 
+                         "Avg_sum_insured")
+
+#Splitting the data (from Commercial_new) -> For validation testing? 
+
+#Building the Severity Model (Internal Factors only)
+
+glm_sev <- glm(total_claims_cost ~ sum_insured + Vehicle_age +
+                 risk_state_name, family = Gamma(link = "log"), data = Commercial_new)
+summary(glm_sev)
 
 
-#JUST INTERNAL VARIABLES
-toink <- glm(total_claims_cost ~ sum_insured,
-              data = Commercial_new, family = Gamma(link = "log"))
-summary(toink)
+
+
+
+
 
