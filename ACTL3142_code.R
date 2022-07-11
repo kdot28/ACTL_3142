@@ -224,7 +224,7 @@ colnames(GLM_data2) <- c("Accident_Quarter", "Claims_Freq", "CPI",
 glm_freq <- glm(Claims_Freq ~  Transport.CPI +
                  Avg_sum_insured + Exchange.Rate, 
                  data = GLM_data2, 
-                 family = poisson(link = "log"))
+                 family = quasipoisson(link = "log"))#to counter overdispersion
 summary(glm_freq)
 
 set.seed(10101)
