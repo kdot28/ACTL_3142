@@ -231,19 +231,20 @@ Claims_freq_2 <- Claims_freq_1 %>%
 
 Claims_freq_3 <- Claims_freq_2 %>%
   group_by(Accident_Quarter) %>%
-  summarise(Claims_Frequency = sum(Claims_no))
+  summarise(Claims_Frequency = sum(Claims_no), exp = sum(exposure_1))
 
 
 GLM_data2 <- cbind(Claims_freq_3, CPI, Fuel_movement, Transport_CPI,
                    JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
-colnames(GLM_data2) <- c("Accident_Quarter", "Claims_Freq", "CPI", 
+colnames(GLM_data2) <- c("Accident_Quarter", "Claims_Freq","Exposure", "CPI", 
                          "Quarterly.Change", "Transport.CPI", "Exchange.Rate", 
                          "Avg_sum_insured")
 
 glm_freq <- glm(Claims_Freq ~  Transport.CPI +
                  Avg_sum_insured + Exchange.Rate, 
                  data = GLM_data2, 
-                 family = quasipoisson(link = "log"))#to counter overdispersion
+                 family = poisson(link = "log"),
+                 )
 summary(glm_freq)
 
 set.seed(10101)
@@ -253,4 +254,9 @@ for (j in 1:10) {glm_sev
 }
 kfold_error_10
 mean((GLM_data2$Claims_Freq - predict.glm(glm_freq))^2)/10
+
+plot(glm_sev)
+
+
+
 
