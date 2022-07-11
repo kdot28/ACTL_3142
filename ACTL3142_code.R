@@ -227,3 +227,11 @@ glm_freq <- glm(Claims_Freq ~  Transport.CPI +
                  family = poisson(link = "log"))
 summary(glm_freq)
 
+set.seed(10101)
+kfold_error_10_a <- rep(0,10)
+for (j in 1:10) {glm_sev
+  kfold_error_10_a[j] <- cv.glm(GLM_data2, glm_freq, K = 10)$delta[1]
+}
+kfold_error_10
+mean((GLM_data2$Claims_Freq - predict.glm(glm_freq))^2)/10
+
