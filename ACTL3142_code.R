@@ -190,8 +190,27 @@ colnames(GLM_data1) <- c("Accident_Quarter", "Average_claim_quarter", "CPI",
 
 #Building the Severity Model (Internal Factors only)
 
-glm_sev <- glm(total_claims_cost ~ sum_insured + Vehicle_age + policy_tenure, 
+############################
+#IF we wanna included the fattest vehicles into claims severity
+fat_vehicle <- Commercial_new$vehicle_class
+fat_vehicle2 <- seq(1:length(fat_vehicle))
+
+for (i in 1:length(fat_vehicle)) {
+  if (fat_vehicle[i] == "Class 10"|fat_vehicle[i] == "Class 11"|fat_vehicle[i] == "Class 8") {
+    fat_vehicle2[i] <- 1
+  } else {
+    fat_vehicle2[i] <- 0
+  }
+}
+
+Commercial_new <- Commercial_new %>%
+  cbind(fat_vehicle2)
+###############################
+glm_sev <- glm(total_claims_cost ~ sum_insured + Vehicle_age + policy_tenure + fat_vehicle2, 
                   family = Gamma(link = "log"), data = Commercial_new)
+
+
+
 summary(glm_sev)
 set.seed(1010)
 kfold_error_10 <- rep(0,10)
