@@ -212,7 +212,7 @@ Claims_freq_2 <- Claims_freq_1 %>%
 
 Claims_freq_3 <- Claims_freq_2 %>%
   group_by(Accident_Quarter) %>%
-  summarise(Claims_Frequency = sum(Claims_no))
+  summarise(Claims_Frequency = sum(Claims_no), exp = sum(exposure_1))
 
 
 GLM_data2 <- cbind(Claims_freq_3, CPI, Fuel_movement, Transport_CPI,
@@ -224,7 +224,8 @@ colnames(GLM_data2) <- c("Accident_Quarter", "Claims_Freq", "CPI",
 glm_freq <- glm(Claims_Freq ~  Transport.CPI +
                  Avg_sum_insured + Exchange.Rate, 
                  data = GLM_data2, 
-                 family = quasipoisson(link = "log"))#to counter overdispersion
+                 family = quasipoisson(link = "log"), 
+                 offset = log(exp))   #to counter over dispersion
 summary(glm_freq)
 
 set.seed(10101)
