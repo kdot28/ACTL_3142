@@ -255,8 +255,5 @@ for (j in 1:10) {glm_sev
 kfold_error_10
 mean((GLM_data2$Claims_Freq - predict.glm(glm_freq))^2)/10
 
-plot(glm_sev)
-
-
-
+fat_vehicle2
 
