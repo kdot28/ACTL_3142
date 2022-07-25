@@ -14,6 +14,7 @@ library(zoo)
 library(caTools)
 library(caret)
 library(boot)
+library(MASS)
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
 
@@ -242,26 +243,40 @@ Actual_claims_freq <- ggplot(data = Claims_freq_4,
                                                                       y = "Claims Freq")
 Actual_claims_freq 
 
-GLM_data2 <- cbind(Claims_freq_3, CPI, Fuel_movement, Transport_CPI,
-                   JPY_AUD, Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
-colnames(GLM_data2) <- c("Accident_Quarter", "Claims_Freq","Exposure", "CPI", 
-                         "Quarterly.Change", "Transport.CPI", "Exchange.Rate", 
-                         "Avg_sum_insured")
+GLM_data2 <- cbind(Claims_freq_4,Iron_steel_Imports,Oil_production,
+                   Transport_Parts_Imports, Transport_equip_machinery,
+                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
+GLM_data3 <- subset(GLM_data2, select = -c(X, X.1, X.2, X.3, X.4, X.5))
+colnames(GLM_data3) <- c("Accident Month", "Claims_Freq", "Iron_Steel_Import", 
+                         "Oil_Production", "Transport_Parts_Import", 
+                         "Transport_Machinery_Import", "Average_Sum_Insured")
+GLM_data3$Claims_Freq <- as.integer(GLM_data3$Claims_Freq)
+GLM_data3$Iron_Steel_Import <- as.integer(GLM_data3$Iron_Steel_Import)
+GLM_data3$Oil_Production <- as.integer(GLM_data3$Oil_Production)
+GLM_data3$Transport_Parts_Import <- as.integer(GLM_data3$Transport_Parts_Import)
+GLM_data3$Transport_Machinery_Import <- as.integer(GLM_data3$Transport_Machinery_Import)
+GLM_data3$Average_Sum_Insured <- as.integer(GLM_data3$Average_Sum_Insured)
 
-glm_freq <- glm(Claims_Freq ~  Transport.CPI +
-                 Avg_sum_insured + Exchange.Rate, 
-                 data = GLM_data2, 
-                 family = poisson(link = "log"),
-                 )
+
+
+glm_freq <- glm(Claims_Freq ~  Iron_Steel_Import + Oil_Production +
+                  Transport_Parts_Import + Transport_Machinery_Import +
+                  Average_Sum_Insured, 
+                 data = GLM_data3, 
+                family = poisson(link = "log"),
+                offset = (Claims_freq_3$expo))
 summary(glm_freq)
 
 set.seed(10101)
 kfold_error_10_a <- rep(0,10)
-for (j in 1:10) {glm_sev
-  kfold_error_10_a[j] <- cv.glm(GLM_data2, glm_freq, K = 10)$delta[1]
+for (j in 1:10) {glm_freq
+  kfold_error_10_a[j] <- cv.glm(GLM_data3, glm_freq, K = 10)$delta[1]
 }
-kfold_error_10
-mean((GLM_data2$Claims_Freq - predict.glm(glm_freq))^2)/10
+freq_k_fold_error <- mean((GLM_data3$Claims_Freq - predict.glm(glm_freq))^2)/10
+freq_k_fold_error
+
+freq_fit <- 
+
 
 
 #
