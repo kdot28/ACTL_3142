@@ -165,10 +165,10 @@ Commercial_new <- Commercial %>%
 # https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release
 #Importing various CPI indices
 
-CPI <- read.csv("CPI_1.csv", header = T)
-Fuel_movement <- read.csv("Automotive fuel Quarterly movement.csv", header = T)
-Transport_CPI <- read.csv("Transport CPI.csv", header = T)
-JPY_AUD <- read.csv("JPY_AUD.csv", header = T)
+Iron_steel_Imports <- read.csv("Iron Steel Import.csv", header = T)
+Oil_production <- read.csv("Crude Oil Production.csv", header = T)
+Transport_Parts_Imports <- read.csv("Transport Parts Import.csv", header = T)
+Transport_equip_machinery <- read.csv("Machinery TransEquip Imports.csv", header = T)
 
 # Attaching them to Monthly Claims severity and frequency (Monthly Claims and 
 # Monthly claim freq 1) --> for easy GLM later on
