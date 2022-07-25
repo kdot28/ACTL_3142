@@ -85,35 +85,35 @@ Claims_per_month <- Commercial %>%
             Total_claims = sum(total_claims_cost))
 Claims_per_month$accident_month<-as.Date(Claims_per_month$accident_month)
 
-Quarterly_claims <- Claims_per_month %>% 
+Monthly_claims <- Claims_per_month %>% 
   group_by(accident_month) %>%
-  mutate(Accident_Quarter = as.yearqtr(accident_month, format = "%Y-%m-%d")) %>%
+  mutate(Accident_Month0 = as.yearmon(accident_month, format = "%Y-%m-%d")) %>%
   summarise(Total_QClaim = sum(Total_claims),
             No_claims = sum(Number_of_claims), Average_claim = Total_QClaim/No_claims) %>%
- mutate(Accident_Quarter = as.yearqtr(accident_month, format = "%Y-%m-%d")) 
+ mutate(Accident_Month0 = as.yearmon(accident_month, format = "%Y-%m-%d")) 
 
-Quarterly_claims <- Quarterly_claims %>%
+Monthly_claims <- Monthly_claims %>%
   group_by(Accident_Quarter) %>% 
   summarise(Average_claim_quarter = sum(Average_claim))
 
 #Actual plot --> can be compared to the CPI/ inflation per quarter and show a similar trend
-ggplot(Quarterly_claims, aes(x = accident_month, y = Total_QClaim)) + 
+ggplot(Monthly_claims, aes(x = accident_month, y = Total_QClaim)) + 
   geom_line() 
 
 #Claims each Quarter
-Quarterly_claim_Freq <- Commercial %>% 
+Monthly_claim_Freq <- Commercial %>% 
   group_by(accident_month) %>%
   summarise(Claims_no = sum(!is.na(total_claims_cost)))
 
-Claim_freq_Quarter <- Quarterly_claim_Freq %>% 
-  mutate(Accident_Quarter = as.yearqtr(accident_month, format = "%Y-%m-%d"))
+Claim_freq_Monthly <- Monthly_claim_Freq %>% 
+  mutate(Accident_Month1 = as.yearmon(accident_month, format = "%Y-%m-%d"))
 
-Quarterly_claim_freq1 <- Claim_freq_Quarter %>%
-  group_by(Accident_Quarter) %>%
+Monthly_claim_freq1 <- Claim_freq_Monthly %>%
+  group_by(Accident_Month1) %>%
   summarise(Total_Q_claim_no = sum(Claims_no))
 
 #Actual plot --> can be compared to the movement 
-ggplot(Quarterly_claim_freq1, aes(x = Accident_Quarter, y = Total_Q_claim_no)) + 
+ggplot(Monthly_claim_freq1, aes(x = Accident_Month1, y = Total_Q_claim_no)) + 
   geom_line()                                                                      
 
 #Costliest States 
