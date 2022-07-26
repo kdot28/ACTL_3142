@@ -15,6 +15,7 @@ library(caTools)
 library(caret)
 library(boot)
 library(MASS)
+library(pscl)
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
 
@@ -258,25 +259,44 @@ GLM_data3$Transport_Machinery_Import <- as.integer(GLM_data3$Transport_Machinery
 GLM_data3$Average_Sum_Insured <- as.integer(GLM_data3$Average_Sum_Insured)
 
 
-
+#Poisson Model
 glm_freq <- glm(Claims_Freq ~  Iron_Steel_Import + Oil_Production +
                   Transport_Parts_Import + Transport_Machinery_Import +
                   Average_Sum_Insured, 
                  data = GLM_data3, 
                 family = poisson(link = "log"),
-                offset = (Claims_freq_3$expo))
+                offset = log(Claims_freq_3$expo))
+                
 summary(glm_freq)
 
+#Negative Binomial Model
+glm_freq1 <- glm.nb(Claims_Freq ~  Iron_Steel_Import + Oil_Production +
+                  Transport_Parts_Import + Transport_Machinery_Import +
+                  Average_Sum_Insured, 
+                data = GLM_data3,
+                offset(log(Claims_freq_3$expo)))
+
+summary(glm_freq1)
+
+
 set.seed(10101)
-kfold_error_10_a <- rep(0,10)
+kfold_error_10_freq <- rep(0,10)
 for (j in 1:10) {glm_freq
   kfold_error_10_a[j] <- cv.glm(GLM_data3, glm_freq, K = 10)$delta[1]
 }
 freq_k_fold_error <- mean((GLM_data3$Claims_Freq - predict.glm(glm_freq))^2)/10
 freq_k_fold_error
 
+set.seed(69)
+kfold_error_10_freq1 <- rep(0,10)
+for (j in 1:10) {glm_freq1
+  kfold_error_10_a1[j] <- cv.glm(GLM_data3, glm_freq1, K = 10)$delta[1]
+}
+freq1_k_fold_error <- mean((GLM_data3$Claims_Freq - predict.glm(glm_freq1))^2)/10
+freq1_k_fold_error
 
 
+lines(Claims_freq_4$Accident_Month2, glm_freq1$fitted.values)
 
-
-#
+y <- plot(Claims_freq_4$Accident_Month2, glm_freq1$fitted.values)
+lines(y)
