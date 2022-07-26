@@ -275,7 +275,7 @@ for (j in 1:10) {glm_freq
 freq_k_fold_error <- mean((GLM_data3$Claims_Freq - predict.glm(glm_freq))^2)/10
 freq_k_fold_error
 
-freq_fit <- 
+
 
 
 
