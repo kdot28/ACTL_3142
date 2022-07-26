@@ -295,7 +295,7 @@ for (j in 1:10) {glm_freq1
 freq1_k_fold_error <- mean((GLM_data3$Claims_Freq - predict.glm(glm_freq1))^2)/10
 freq1_k_fold_error
 
-
+#Plotting the fitted curve (not predicted I guess)
 lines(Claims_freq_4$Accident_Month2, glm_freq1$fitted.values)
 
 y <- plot(Claims_freq_4$Accident_Month2, glm_freq1$fitted.values)
