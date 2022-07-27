@@ -217,7 +217,7 @@ for (i in 1:length(fat_vehicle)) {
 Commercial_new <- Commercial_new %>%
   cbind(fat_vehicle2)
 # GLM SEVERITY
-glm_sev <- glm(Claims_Severity ~  (Iron_Steel_Import) + (Oil_Production) +
+glm_sev <- glm(Claims_Severity ~   (Oil_Production) +
                  (Transport_Parts_Import) + (Transport_Machinery_Import) + 
                  Average_Sum_Insured, 
                data = GLM_data1_a, 
