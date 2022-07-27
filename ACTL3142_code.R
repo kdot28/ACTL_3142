@@ -295,7 +295,7 @@ dispersiontest(glm_freq)
 #Indication of slight overdispersion
 
 #Quasi Poisson Model
-glm_freq1 <- glm(Claims_Count ~  (Iron_Steel_Import) + (Oil_Production) +
+glm_freq1 <- glm(Claims_Count ~  Iron_Steel_Import + (Oil_Production) +
                    (Transport_Parts_Import) + (Transport_Machinery_Import) +
                    (Average_Sum_Insured), 
                  data = GLM_data3, 
