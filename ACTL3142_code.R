@@ -175,7 +175,7 @@ Iron_steel_Imports <- read.csv("Iron Steel Import.csv", header = T)
 Oil_production <- read.csv("Crude Oil Production.csv", header = T)
 Transport_Parts_Imports <- read.csv("Transport Parts Import.csv", header = T)
 Transport_equip_machinery <- read.csv("Machinery TransEquip Imports.csv", header = T)
-
+gold.price <- read.csv("gold.price.per.ounce.csv", header = T)
 
 # ---- SEVERITY ----
 
