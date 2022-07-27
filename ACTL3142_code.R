@@ -16,6 +16,8 @@ library(caret)
 library(boot)
 library(MASS)
 library(pscl)
+library(AER)
+library(VGAM)
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
 
@@ -181,11 +183,20 @@ Transport_equip_machinery <- read.csv("Machinery TransEquip Imports.csv", header
 
 #JUST INTERNAL VARIABLES (maybe Externals -> so have data frame ready)
 
-GLM_data1 <- cbind(Quarterly_claims, CPI, Fuel_movement, Transport_CPI, JPY_AUD, 
-                   Avg_sum_insured = Sum_insured_quarterly$Avg_sum_insured)
-colnames(GLM_data1) <- c("Accident_Quarter", "Average_claim_quarter", "CPI", 
-                        "Quarterly.Change", "Transport.CPI", "Exchange.Rate", 
-                        "Avg_sum_insured")
+GLM_data1 <- cbind(Monthly_claims, Iron_steel_Imports,Oil_production,
+                   Transport_Parts_Imports, Transport_equip_machinery,
+                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
+GLM_data1_a <- subset(GLM_data1, select = -c(X, X.1, X.2, X.3, X.4, X.5))
+colnames(GLM_data1_a) <- c("Accident Month", "Claims_Severity", "Iron_Steel_Import", 
+                         "Oil_Production", "Transport_Parts_Import", 
+                         "Transport_Machinery_Import", "Average_Sum_Insured")
+GLM_data1_a$Claims_Severity <- as.integer(GLM_data1_a$Claims_Severity)
+GLM_data1_a$Iron_Steel_Import <- as.integer(GLM_data1_a$Iron_Steel_Import)
+GLM_data1_a$Oil_Production <- as.integer(GLM_data1_a$Oil_Production)
+GLM_data1_a$Transport_Parts_Import <- as.integer(GLM_data1_a$Transport_Parts_Import)
+GLM_data1_a$Transport_Machinery_Import <- as.integer(GLM_data1_a$Transport_Machinery_Import)
+GLM_data1_a$Average_Sum_Insured <- as.integer(GLM_data1_a$Average_Sum_Insured)
+
 
 #Splitting the data (from Commercial_new) -> For validation testing? 
 
@@ -207,20 +218,22 @@ for (i in 1:length(fat_vehicle)) {
 Commercial_new <- Commercial_new %>%
   cbind(fat_vehicle2)
 ############################### GLM SEVERITY
-glm_sev <- glm(total_claims_cost ~ sum_insured + Vehicle_age + policy_tenure + fat_vehicle2, 
-                  family = Gamma(link = "log"), data = Commercial_new)
-
-
+glm_sev <- glm(Claims_Severity ~  (Iron_Steel_Import) + (Oil_Production) +
+                 (Transport_Parts_Import) + (Transport_Machinery_Import) + 
+                 Average_Sum_Insured, 
+               data = GLM_data1_a, 
+               family = Gamma(link = "log"))
 
 summary(glm_sev)
 set.seed(1010)
 kfold_error_10 <- rep(0,10)
 for (i in 1:10) {glm_sev
-  kfold_error_10[i] <- cv.glm(Commercial_new, glm_sev, K = 10)$delta[1]
+  kfold_error_10[i] <- cv.glm(GLM_data1_a, glm_sev, K = 10)$delta[1]
 }
 kfold_error_10
-mean((Commercial_new$total_claims_cost - predict.glm(glm_sev))^2)/10
-
+mean(kfold_error_10)
+y <- mean((GLM_data1_a$Claims_Severity - predict.glm(glm_sev))^2)/10
+y
 # ---- Frequency ----
 #Creating Claim frequency thing
 Claims_freq_1 <- Commercial_new %>% 
@@ -232,11 +245,13 @@ Claims_freq_2 <- Claims_freq_1 %>%
 
 Claims_freq_3 <- Claims_freq_2 %>%
   group_by(Accident_Month2) %>%
-  summarise(Claims_Frequency = sum(Claims_no), expo = sum(exposure_1))
+  summarise(Claims_Count = sum(Claims_no), expo = sum(exposure_1))
+Claims_freq_3$expo <- as.integer(Claims_freq_3$expo)
 
 Claims_freq_4 <- Claims_freq_3 %>% 
   group_by(Accident_Month2) %>%
-  summarise(A_claims_freq = Claims_Frequency/expo)
+  summarise(A_claims_freq = Claims_Count/expo)
+
 
 #Graph for claims frequency
 Actual_claims_freq <- ggplot(data = Claims_freq_4, 
@@ -244,14 +259,15 @@ Actual_claims_freq <- ggplot(data = Claims_freq_4,
                                                                       y = "Claims Freq")
 Actual_claims_freq 
 
+#Data Compilation
 GLM_data2 <- cbind(Claims_freq_4,Iron_steel_Imports,Oil_production,
                    Transport_Parts_Imports, Transport_equip_machinery,
                    Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
 GLM_data3 <- subset(GLM_data2, select = -c(X, X.1, X.2, X.3, X.4, X.5))
-colnames(GLM_data3) <- c("Accident Month", "Claims_Freq", "Iron_Steel_Import", 
+colnames(GLM_data3) <- c("Accident Month", "Claims_Count", "Iron_Steel_Import", 
                          "Oil_Production", "Transport_Parts_Import", 
                          "Transport_Machinery_Import", "Average_Sum_Insured")
-GLM_data3$Claims_Freq <- as.integer(GLM_data3$Claims_Freq)
+GLM_data3$Claims_Count <- as.integer(GLM_data3$Claims_Count)
 GLM_data3$Iron_Steel_Import <- as.integer(GLM_data3$Iron_Steel_Import)
 GLM_data3$Oil_Production <- as.integer(GLM_data3$Oil_Production)
 GLM_data3$Transport_Parts_Import <- as.integer(GLM_data3$Transport_Parts_Import)
@@ -259,22 +275,27 @@ GLM_data3$Transport_Machinery_Import <- as.integer(GLM_data3$Transport_Machinery
 GLM_data3$Average_Sum_Insured <- as.integer(GLM_data3$Average_Sum_Insured)
 
 
+
+
 #Poisson Model
-glm_freq <- glm(Claims_Freq ~  Iron_Steel_Import + Oil_Production +
-                  Transport_Parts_Import + Transport_Machinery_Import +
-                  Average_Sum_Insured, 
+glm_freq <- glm(Claims_Count ~  (Iron_Steel_Import) + (Oil_Production) +
+                  (Transport_Parts_Import) + (Transport_Machinery_Import), 
                  data = GLM_data3, 
-                family = poisson(link = "log"),
-                offset = log(Claims_freq_3$expo))
+                family = poisson(link = "log"))
                 
 summary(glm_freq)
 
-#Negative Binomial Model
-glm_freq1 <- glm.nb(Claims_Freq ~  Iron_Steel_Import + Oil_Production +
-                  Transport_Parts_Import + Transport_Machinery_Import +
-                  Average_Sum_Insured, 
-                data = GLM_data3,
-                offset(log(Claims_freq_3$expo)))
+#Overdispersion test
+overdispersion_test <- 942.82/54
+
+#since value is significantly greater than 1
+
+#Quasi Poisson Model
+glm_freq1 <- glm(Claims_Count ~  (Iron_Steel_Import) + (Oil_Production) +
+                   (Transport_Parts_Import) + (Transport_Machinery_Import) +
+                   (Average_Sum_Insured), 
+                 data = GLM_data3, 
+                 family = quasipoisson(link = "log"))
 
 summary(glm_freq1)
 
@@ -282,21 +303,26 @@ summary(glm_freq1)
 set.seed(10101)
 kfold_error_10_freq <- rep(0,10)
 for (j in 1:10) {glm_freq
-  kfold_error_10_a[j] <- cv.glm(GLM_data3, glm_freq, K = 10)$delta[1]
+  kfold_error_10_freq[j] <- cv.glm(GLM_data3, glm_freq, K = 10)$delta[1]
 }
-freq_k_fold_error <- mean((GLM_data3$Claims_Freq - predict.glm(glm_freq))^2)/10
-freq_k_fold_error
+kfold_error_10_freq
+kfold_freq <- mean(kfold_error_10_freq)
+freq_MSE <- mean((GLM_data3$Claims_Count - predict.glm(glm_freq))^2)
+freq_MSE
 
 set.seed(69)
 kfold_error_10_freq1 <- rep(0,10)
-for (j in 1:10) {glm_freq1
-  kfold_error_10_a1[j] <- cv.glm(GLM_data3, glm_freq1, K = 10)$delta[1]
+for (k in 1:10) {glm_freq1
+  kfold_error_10_freq1[k] <- cv.glm(GLM_data3, glm_freq1, K = 10)$delta[1]
 }
-freq1_k_fold_error <- mean((GLM_data3$Claims_Freq - predict.glm(glm_freq1))^2)/10
-freq1_k_fold_error
+kfold_error_10_freq1
+kfold_freq1 <- mean(kfold_error_10_freq1)
+freq1_MSE <- mean((GLM_data3$Claims_Count - predict.glm(glm_freq1))^2)
+freq1_MSE
 
 #Plotting the fitted curve (not predicted I guess)
-lines(Claims_freq_4$Accident_Month2, glm_freq1$fitted.values)
+
 
 y <- plot(Claims_freq_4$Accident_Month2, glm_freq1$fitted.values)
-lines(y)
+
+
