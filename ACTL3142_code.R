@@ -182,6 +182,10 @@ gold.price <- read.csv("gold.price.per.ounce.csv", header = T)
 
 #Data compilation for claims severity
 
+GLM_freq_ext <- cbind(Iron_steel_Imports,Oil_production,
+                      Transport_Parts_Imports, Transport_equip_machinery, gold.price)
+
+
 GLM_data1 <- cbind(Monthly_claims, Iron_steel_Imports,Oil_production,
                    Transport_Parts_Imports, Transport_equip_machinery,
                    Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
