@@ -237,8 +237,6 @@ y <- mean((GLM_data1_a$Claims_Severity - predict.glm(glm_sev))^2)/10
 y
 
 
-
-
 # ---- Frequency ----
 #Creating Claim frequency thing
 Claims_freq_1 <- Commercial_new %>% 
@@ -330,4 +328,7 @@ freq1_MSE
 #Plotting the fitted curve (not predicted I guess)
 y <- plot(Claims_freq_1$Accident_Month2, glm_freq1$fitted.values)
 lines(Claims_freq_1$Accident_Month2, glm_freq1$fitted.values)
+
+
+
 
