@@ -185,7 +185,7 @@ Transport_equip_machinery <- read.csv("Machinery TransEquip Imports.csv", header
 GLM_data1 <- cbind(Monthly_claims, Iron_steel_Imports,Oil_production,
                    Transport_Parts_Imports, Transport_equip_machinery,
                    Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
-GLM_data1_a <- subset(GLM_data1, select = -c(X, X.1, X.2, X.3, X.4, X.5))
+GLM_data1_a <- GLM_data1
 colnames(GLM_data1_a) <- c("Accident Month", "Claims_Severity", "Iron_Steel_Import", 
                          "Oil_Production", "Transport_Parts_Import", 
                          "Transport_Machinery_Import", "Average_Sum_Insured")
@@ -328,7 +328,6 @@ freq1_MSE
 #Plotting the fitted curve (not predicted I guess)
 y <- plot(Claims_freq_1$Accident_Month2, glm_freq1$fitted.values)
 lines(Claims_freq_1$Accident_Month2, glm_freq1$fitted.values)
-
 
 
 
