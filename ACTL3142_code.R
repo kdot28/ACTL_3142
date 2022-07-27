@@ -184,6 +184,8 @@ gold.price <- read.csv("gold.price.per.ounce.csv", header = T)
 
 GLM_external <- cbind(Iron_steel_Imports,Oil_production,
                       Transport_Parts_Imports, Transport_equip_machinery, gold.price)
+training <- GLM_external[1:60,]
+testing <- GLM_external[-(1:60),]
 
 
 GLM_data1 <- cbind(Monthly_claims, Iron_steel_Imports,Oil_production,
