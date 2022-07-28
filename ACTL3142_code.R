@@ -261,7 +261,7 @@ Claims_freq_1 <- Claims_freq_1 %>%
   group_by(Accident_Month2) %>%
   summarise(A_claims_freq = Claims_Count/expo)
 
-
+Claims_freq_1 <- rbind(claims_freq_1)
 #Graph for claims frequency
 Actual_claims_freq <- ggplot(data = Claims_freq_1, 
              aes(Accident_Month2, A_claims_freq))+ geom_line() + labs(x = "Accident Month",
@@ -269,13 +269,14 @@ Actual_claims_freq <- ggplot(data = Claims_freq_1,
 Actual_claims_freq 
 
 #Data Compilation for frequency modelling 
-GLM_data2 <- cbind(Claims_freq_1,Iron_steel_Imports,Oil_production,
-                   Transport_Parts_Imports, Transport_equip_machinery,
+GLM_data2 <- cbind(Claims_freq_1,Iron_steel_Imports[-(1:12),],Oil_production[-(1:12),],
+                   Transport_Parts_Imports[-(1:12),], Transport_equip_machinery[-(1:12),],
                    Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
-GLM_data3 <- subset(GLM_data2, select = -c(X, X.1, X.2, X.3, X.4, X.5))
-colnames(GLM_data3) <- c("Accident Month", "Claims_Count", "Iron_Steel_Import", 
+
+colnames(GLM_data2) <- c("Accident Month", "Claims_Count", "Iron_Steel_Import", 
                          "Oil_Production", "Transport_Parts_Import", 
                          "Transport_Machinery_Import", "Average_Sum_Insured")
+GLM_data3 <- GLM_data2
 GLM_data3$Claims_Count <- as.integer(GLM_data3$Claims_Count)
 GLM_data3$Iron_Steel_Import <- as.integer(GLM_data3$Iron_Steel_Import)
 GLM_data3$Oil_Production <- as.integer(GLM_data3$Oil_Production)
@@ -289,7 +290,7 @@ GLM_data3$Average_Sum_Insured <- as.integer(GLM_data3$Average_Sum_Insured)
 #Poisson Model
 glm_freq <- glm(Claims_Count ~  (Iron_Steel_Import) + (Oil_Production) +
                   (Transport_Parts_Import) + (Transport_Machinery_Import), 
-                 data = GLM_data3, 
+                 data = GLM_data2, 
                 family = poisson(link = "log"))
                 
 summary(glm_freq)
@@ -304,7 +305,7 @@ dispersiontest(glm_freq)
 glm_freq1 <- glm(Claims_Count ~  Iron_Steel_Import + (Oil_Production) +
                    (Transport_Parts_Import) + (Transport_Machinery_Import) +
                    (Average_Sum_Insured), 
-                 data = GLM_data3, 
+                 data = GLM_data2, 
                  family = quasipoisson(link = "log"))
 
 summary(glm_freq1)
