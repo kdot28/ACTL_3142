@@ -222,10 +222,7 @@ vehicle_level <- seq(1:length(vehicle_class))
 
 for (i in 1:length(vehicle_class)) {
   if (vehicle_class[i] == "Class 10"|vehicle_class[i] == "Class 11"|vehicle_class[i] == "Class 8") {
-    vehicle_class2[i] <- 2
-  } else if (vehicle_class[i] == "Class 7"|vehicle_class[i] == "Class 13"|vehicle_class[i] == "Class 5" |
-             vehicle_class[i] == "Class 1"|vehicle_class[i] == "Class 9"|vehicle_class[i] == "Class 12") {
-    vehicle_level[i] <- 1
+    vehicle_class2[i] <- 1
   } else {
     vehicle_level[i] <- 0
   }
