@@ -162,39 +162,46 @@ Number_in_each_class <- Commercial %>%
 # predict claims inflation)
 Commercial_new <- Commercial %>%
   na.omit(Commercial$total_claims_cost) %>% filter(total_claims_cost > 0) %>%
-  mutate(Vehicle_age = 2022 - year_of_manufacture) %>% filter(Vehicle_age > 0)
+  mutate(Vehicle_age = 2022 - year_of_manufacture) %>% filter(Vehicle_age >= 0)
 
 
 
 # tranport CPI source : https://www.fxempire.com/macro/australia/cpi-transportation
 # CPI + fuel movement source: 
 # https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release
-#Importing external data (monthly - not lagged)
+# Importing external data (monthly - not lagged)
+# Date range for each dataset Jul 2015 - 
 
 Iron_steel_Imports <- read.csv("Iron Steel Import.csv", header = T)
 Oil_production <- read.csv("Crude Oil Production.csv", header = T)
 Transport_Parts_Imports <- read.csv("Transport Parts Import.csv", header = T)
 Transport_equip_machinery <- read.csv("Machinery TransEquip Imports.csv", header = T)
-gold.price <- read.csv("gold.price.per.ounce.csv", header = T)
-
+Gold_Price <- read.csv("gold.price.per.ounce.csv", header = T)
 # ---- SEVERITY ----
 
 
 #Data compilation for claims severity
 
 GLM_external <- cbind(Iron_steel_Imports,Oil_production,
-                      Transport_Parts_Imports, Transport_equip_machinery, gold.price)
+                      Transport_Parts_Imports, Transport_equip_machinery, Gold_Price)
 training <- GLM_external[1:60,]
 testing <- GLM_external[-(1:60),]
 
+# Using lagged data, so the first 60 data points (JUL 2015 - JUL 2020) used
+# to model JUL 2016 - JUL 2021
+# The remaining data (AUG 2021 - JUL 2022) used to predict for AUG 2022 - JUL 2023
+external_first_60 <- GLM_external[(1:60),]
 
-GLM_data1 <- cbind(Monthly_claims, Iron_steel_Imports,Oil_production,
-                   Transport_Parts_Imports, Transport_equip_machinery,
-                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
+GLM_data1 <- cbind(Monthly_claims, external_first_60,
+                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured,
+                   Lagged_date = Monthly_claims[,1] + 1)
+colnames(GLM_data1) <- c("Date", "Claims_Severity", "Iron_Steel_Import", 
+                         "Oil_Production", "Transport_Parts_Import", "Gold_Price",
+                         "Transport_Machinery_Import", "Average_Sum_Insured", "Lagged_date")
+
+#Lags the date backwards 1 year
+
 GLM_data1_a <- GLM_data1
-colnames(GLM_data1_a) <- c("Accident Month", "Claims_Severity", "Iron_Steel_Import", 
-                         "Oil_Production", "Transport_Parts_Import", 
-                         "Transport_Machinery_Import", "Average_Sum_Insured")
 GLM_data1_a$Claims_Severity <- as.integer(GLM_data1_a$Claims_Severity)
 GLM_data1_a$Iron_Steel_Import <- as.integer(GLM_data1_a$Iron_Steel_Import)
 GLM_data1_a$Oil_Production <- as.integer(GLM_data1_a$Oil_Production)
@@ -203,25 +210,29 @@ GLM_data1_a$Transport_Machinery_Import <- as.integer(GLM_data1_a$Transport_Machi
 GLM_data1_a$Average_Sum_Insured <- as.integer(GLM_data1_a$Average_Sum_Insured)
 
 
+
 #Splitting the data (from Commercial_new) -> For validation testing? 
 
 #Building the Severity Model (Internal Factors only)
 
 # VEHICLE CLASS INCLUSION
 #IF we wanna included the fattest vehicles into claims severity
-fat_vehicle <- Commercial_new$vehicle_class
-fat_vehicle2 <- seq(1:length(fat_vehicle))
+vehicle_class <- Commercial_new$vehicle_class
+vehicle_level <- seq(1:length(vehicle_class))
 
-for (i in 1:length(fat_vehicle)) {
-  if (fat_vehicle[i] == "Class 10"|fat_vehicle[i] == "Class 11"|fat_vehicle[i] == "Class 8") {
-    fat_vehicle2[i] <- 1
+for (i in 1:length(vehicle_class)) {
+  if (vehicle_class[i] == "Class 10"|vehicle_class[i] == "Class 11"|vehicle_class[i] == "Class 8") {
+    vehicle_class2[i] <- 2
+  } else if (vehicle_class[i] == "Class 7"|vehicle_class[i] == "Class 13"|vehicle_class[i] == "Class 5" |
+             vehicle_class[i] == "Class 1"|vehicle_class[i] == "Class 9"|vehicle_class[i] == "Class 12") {
+    vehicle_level[i] <- 1
   } else {
-    fat_vehicle2[i] <- 0
+    vehicle_level[i] <- 0
   }
 }
 
 Commercial_new <- Commercial_new %>%
-  cbind(fat_vehicle2)
+  cbind(vehicle_level)
 # GLM SEVERITY
 glm_sev <- glm(Claims_Severity ~   (Oil_Production) +
                  (Transport_Parts_Import) + (Transport_Machinery_Import) + 
