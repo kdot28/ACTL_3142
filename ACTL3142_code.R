@@ -233,14 +233,23 @@ for (i in 1:length(vehicle_class)) {
 
 Commercial_new <- Commercial_new %>%
   cbind(vehicle_level)
+
 # GLM SEVERITY
 glm_sev <- glm(Claims_Severity ~   (Oil_Production) +
                  (Transport_Parts_Import) + (Transport_Machinery_Import) + 
-                 Average_Sum_Insured, 
+                 Average_Sum_Insured + Gold_Price,
                data = GLM_data1_a, 
                family = Gamma(link = "log"))
 
 summary(glm_sev)
+
+glm_sev1 <- glm(Claims_Severity ~   (Oil_Production) +
+                 (Transport_Parts_Import) + (Transport_Machinery_Import) + 
+                 Average_Sum_Insured + Gold_Price,
+               data = GLM_data1_a, 
+               family = lognormal())
+
+summary(glm_sev1)
 
 #k fold for severity
 set.seed(1010)
@@ -268,25 +277,25 @@ Claims_freq_1 <- Claims_freq_1 %>%
   summarise(Claims_Count = sum(Claims_no), expo = sum(exposure_1))
 Claims_freq_1$expo <- as.integer(Claims_freq_1$expo)
 
-Claims_freq_1 <- Claims_freq_1 %>% 
+Claims_freq_2 <- Claims_freq_1 %>% 
   group_by(Accident_Month2) %>%
   summarise(A_claims_freq = Claims_Count/expo)
 
-Claims_freq_1 <- rbind(claims_freq_1)
+Claims_freq_2 <- rbind(Claims_freq_2)
 #Graph for claims frequency
-Actual_claims_freq <- ggplot(data = Claims_freq_1, 
+Actual_claims_freq <- ggplot(data = Claims_freq_2, 
              aes(Accident_Month2, A_claims_freq))+ geom_line() + labs(x = "Accident Month",
                                                                       y = "Claims Freq")
 Actual_claims_freq 
 
 #Data Compilation for frequency modelling 
-GLM_data2 <- cbind(Claims_freq_1,Iron_steel_Imports[-(1:12),],Oil_production[-(1:12),],
-                   Transport_Parts_Imports[-(1:12),], Transport_equip_machinery[-(1:12),],
-                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured)
+GLM_data2 <- cbind(Claims_freq_2,Iron_steel_Imports[-(61:72),],Oil_production[-(61:72),],
+                   Transport_Parts_Imports[-(61:72),], Transport_equip_machinery[-(61:72),],
+                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured, Gold_Price[-(61:72),])
 
-colnames(GLM_data2) <- c("Accident Month", "Claims_Count", "Iron_Steel_Import", 
+colnames(GLM_data2) <- c("Accident_Month", "Claims_Count", "Iron_Steel_Import", 
                          "Oil_Production", "Transport_Parts_Import", 
-                         "Transport_Machinery_Import", "Average_Sum_Insured")
+                         "Transport_Machinery_Import", "Average_Sum_Insured", "gold_price")
 GLM_data3 <- GLM_data2
 GLM_data3$Claims_Count <- as.integer(GLM_data3$Claims_Count)
 GLM_data3$Iron_Steel_Import <- as.integer(GLM_data3$Iron_Steel_Import)
@@ -294,14 +303,15 @@ GLM_data3$Oil_Production <- as.integer(GLM_data3$Oil_Production)
 GLM_data3$Transport_Parts_Import <- as.integer(GLM_data3$Transport_Parts_Import)
 GLM_data3$Transport_Machinery_Import <- as.integer(GLM_data3$Transport_Machinery_Import)
 GLM_data3$Average_Sum_Insured <- as.integer(GLM_data3$Average_Sum_Insured)
-
+GLM_data3$gold_price <- as.integer(GLM_data3$gold_price)
 
 
 
 #Poisson Model
 glm_freq <- glm(Claims_Count ~  (Iron_Steel_Import) + (Oil_Production) +
-                  (Transport_Parts_Import) + (Transport_Machinery_Import), 
-                 data = GLM_data2, 
+                  (Transport_Parts_Import) + (Transport_Machinery_Import)+
+                  Average_Sum_Insured + gold_price,
+                 data = GLM_data3, 
                 family = poisson(link = "log"))
                 
 summary(glm_freq)
@@ -310,13 +320,13 @@ summary(glm_freq)
 
 dispersiontest(glm_freq)
 
-#Indication of slight overdispersion
+#Indication of slight over dispersion
 
 #Quasi Poisson Model
 glm_freq1 <- glm(Claims_Count ~  Iron_Steel_Import + (Oil_Production) +
                    (Transport_Parts_Import) + (Transport_Machinery_Import) +
                    (Average_Sum_Insured), 
-                 data = GLM_data2, 
+                 data = GLM_data3, 
                  family = quasipoisson(link = "log"))
 
 summary(glm_freq1)
@@ -348,4 +358,37 @@ y <- plot(Claims_freq_1$Accident_Month2, glm_freq1$fitted.values)
 lines(Claims_freq_1$Accident_Month2, glm_freq1$fitted.values)
 
 
+
+#Plotting Actual vs Predicted (for the claims frequency model)
+predict_freq <- predict(glm_freq,type = 'response')
+
+
+results_freq <- data.frame(predicted = predict_freq, 
+                           actual = GLM_data2$Claims_Count, 
+                           Accident_Month = GLM_data3$Accident_Month)
+
+
+Actual_vs_pred <- ggplot(results_freq, aes(Accident_Month)) + 
+  geom_line(aes(y = (predicted), colour = "predicted")) + 
+  geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
+                                                       y = "Claims Freq")
+                                                       
+Actual_vs_pred
+
+
+#sev
+predict_sev <- predict(glm_sev,type = 'response')
+
+
+results_sev <- data.frame(predicted = predict_sev, 
+                           actual = GLM_data1_a$Claims_Severity, 
+                           Accident_Month = GLM_data1_a$Date)
+
+
+Actual_vs_pred1 <- ggplot(results_sev, aes(Accident_Month)) + 
+  geom_line(aes(y = (predicted), colour = "predicted")) + 
+  geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
+                                                         y = "Claims sev")
+
+Actual_vs_pred1
 
