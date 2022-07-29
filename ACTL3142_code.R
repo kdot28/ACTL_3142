@@ -264,6 +264,11 @@ y
 
 
 # ---- Frequency ----
+
+# NUMBER of policies active per month
+df <- data.frame(month = Claims_freq_1$Accident_Month2, no_active_policies = 0)
+df$no_active_policies<- table(Commercial$accident_month)
+
 #Creating Claim frequency thing
 Claims_freq_1 <- Commercial_new %>% 
   group_by(accident_month) %>%
@@ -291,27 +296,21 @@ Actual_claims_freq
 #Data Compilation for frequency modelling 
 GLM_data2 <- cbind(Claims_freq_2,Iron_steel_Imports[-(61:72),],Oil_production[-(61:72),],
                    Transport_Parts_Imports[-(61:72),], Transport_equip_machinery[-(61:72),],
-                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured, Gold_Price[-(61:72),])
+                   Avg_sum_insured = Sum_insured_Monthly$Avg_sum_insured, Gold_Price[-(61:72),],
+                   df$no_active_policies)
 
 colnames(GLM_data2) <- c("Accident_Month", "Claims_Count", "Iron_Steel_Import", 
                          "Oil_Production", "Transport_Parts_Import", 
-                         "Transport_Machinery_Import", "Average_Sum_Insured", "gold_price")
-GLM_data3 <- GLM_data2
-GLM_data3$Claims_Count <- as.integer(GLM_data3$Claims_Count)
-GLM_data3$Iron_Steel_Import <- as.integer(GLM_data3$Iron_Steel_Import)
-GLM_data3$Oil_Production <- as.integer(GLM_data3$Oil_Production)
-GLM_data3$Transport_Parts_Import <- as.integer(GLM_data3$Transport_Parts_Import)
-GLM_data3$Transport_Machinery_Import <- as.integer(GLM_data3$Transport_Machinery_Import)
-GLM_data3$Average_Sum_Insured <- as.integer(GLM_data3$Average_Sum_Insured)
-GLM_data3$gold_price <- as.integer(GLM_data3$gold_price)
+                         "Transport_Machinery_Import", "Average_Sum_Insured", "gold_price",
+                         "huh", "Active_Policies")
+GLM_data3 = subset(GLM_data2, select = -huh)
+GLM_data3[,-1] <- mutate_all(GLM_data3[,-1], function(x) as.integer(x))
 
-
+df1<- cbind(Claims_freq_2, training)
 
 #Poisson Model
-glm_freq <- glm(Claims_Count ~  (Iron_Steel_Import) + (Oil_Production) +
-                  (Transport_Parts_Import) + (Transport_Machinery_Import)+
-                  Average_Sum_Insured + gold_price,
-                 data = GLM_data3, 
+glm_freq <- glm(Claims_Count ~ .,
+                 data = GLM_data3[,-c(1,9)], 
                 family = poisson(link = "log"))
                 
 summary(glm_freq)
@@ -323,11 +322,10 @@ dispersiontest(glm_freq)
 #Indication of slight over dispersion
 
 #Quasi Poisson Model
-glm_freq1 <- glm(Claims_Count ~  Iron_Steel_Import + (Oil_Production) +
-                   (Transport_Parts_Import) + (Transport_Machinery_Import) +
-                   (Average_Sum_Insured), 
-                 data = GLM_data3, 
-                 family = quasipoisson(link = "log"))
+glm_freq1 <- glm(Claims_Count ~  ., 
+                 data = GLM_data3[, -c(1,9)] , 
+                 family = quasipoisson(link = "log")
+                 )
 
 summary(glm_freq1)
 
@@ -360,24 +358,23 @@ lines(Claims_freq_1$Accident_Month2, glm_freq1$fitted.values)
 
 
 #Plotting Actual vs Predicted (for the claims frequency model)
-predict_freq <- predict(glm_freq,type = 'response')
-
+predict_freq <- predict.glm(glm_freq, type = 'response')
 
 results_freq <- data.frame(predicted = predict_freq, 
-                           actual = GLM_data2$Claims_Count, 
-                           Accident_Month = GLM_data3$Accident_Month)
+                           actual = as.numeric(GLM_data2$Claims_Count), 
+                           Accident_Month = GLM_data2$Accident_Month)
 
 
 Actual_vs_pred <- ggplot(results_freq, aes(Accident_Month)) + 
   geom_line(aes(y = (predicted), colour = "predicted")) + 
   geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
-                                                       y = "Claims Freq")
+                                                       y = "Claims Frequency")
                                                        
 Actual_vs_pred
 
 
 #sev
-predict_sev <- predict(glm_sev,type = 'response')
+predict_sev <- predict.glm(glm_sev,type = 'response')
 
 
 results_sev <- data.frame(predicted = predict_sev, 
