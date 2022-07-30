@@ -142,7 +142,8 @@ results_sev <- data.frame(predicted = exp(gamma_sev_pred),
 Actual_vs_pred_sev <- ggplot(results_sev, aes(Accident_Month)) + 
   geom_line(aes(y = (predicted), colour = "predicted")) + 
   geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
-                                                         y = "Claims Severity")
+                                                         y = "Claims Severity",
+                                                         title = "Gamma (Actual vs Predicted)")
 
 Actual_vs_pred_sev
 
@@ -155,7 +156,8 @@ results_sev1 <- data.frame(predicted = exp(gaus_sev_pred),
 Actual_vs_pred_sev1 <- ggplot(results_sev1, aes(Accident_Month)) + 
   geom_line(aes(y = (predicted), colour = "predicted")) + 
   geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
-                                                         y = "Claims Severity")
+                                                         y = "Claims Severity",
+                                                         title = "Gaussian (Actual vs Predicted)")
 
 Actual_vs_pred_sev1
 
