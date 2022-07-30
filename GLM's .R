@@ -287,5 +287,6 @@ Actual_vs_pred_freq2 <- ggplot(results_freq2, aes(Accident_Month)) +
 Actual_vs_pred_freq2
 
 
+#Claims Inflation
 
 
