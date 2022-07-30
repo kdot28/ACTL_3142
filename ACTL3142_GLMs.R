@@ -238,7 +238,7 @@ mean(kfold_error_5b)
 
 
 # Negative Binomial
-nb_freq <- glm.nb(frequency ~., data = GLM_frequency_3[c(1:60) ,-c(1,2,3)],
+nb_freq <- glm.nb((frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1,2,3)],
                   control = glm.control(maxit = 10000))
 
 summary(nb_freq)
