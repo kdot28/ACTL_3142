@@ -201,14 +201,15 @@ pois_kfold_plot
 dispersiontest(pois_freq)
 
 # Quasi Poisson
-quasi_freq <- glm(as.integer(frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1,2,3)],
-                 family = quasipoisson(link = "log"))
+quasi_freq <- glm(Claim_Count ~., data = GLM_frequency_3[c(1:60) ,-c(1,3,10)],
+                 family = quasipoisson(link = "log"), offset = log(GLM_frequency_3$exposure_1)[1:60])
 
 summary(quasi_freq)
 
 quasi_freq_pred <- predict.glm(quasi_freq, newdata = GLM_frequency_3[-c(49:60),])
-sum((quasi_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2)
+sum((quasi_freq_pred - GLM_frequency_3[-c(49:60),]$Claim_Count)^2)
 
+#K-Fold not working (due to claims count prediction and not frequency)
 set.seed(2020)
 kfold_error_5b <- rep(0,5)
 for (i in 1:5) {quasi_freq
@@ -216,6 +217,9 @@ for (i in 1:5) {quasi_freq
 }
 kfold_error_5b
 mean(kfold_error_5b)
+
+quasi_kfold_plot <- plot_kfold_cv(data = GLM_frequency_3[-c(49:60),], quasi_freq)
+quasi_kfold_plot
 
 # Negative Binomial
 nb_freq <- glm.nb(Claim_Count ~., data = GLM_frequency_3[c(1:60) ,-c(1,3,10)],
@@ -236,7 +240,7 @@ sum((nb_freq_pred - GLM_frequency_3[-c(49:60),]$Claim_Count)^2)
 #mean(kfold_error_5c)
 
 #Since K fold not working (under fits for smaller values and overfits for larger values)
-nb_kfold_plot <- plot_kfold_cv(data = GLM_frequency_3[-c(49:60),], nb_freq, K = 5)
+nb_kfold_plot <- plot_kfold_cv(data = GLM_frequency_3[-c(49:60),], nb_freq)
 nb_kfold_plot
 
 
@@ -249,32 +253,37 @@ results_freq <- data.frame(predicted = exp(pois_freq_pred),
 Actual_vs_pred_freq <- ggplot(results_freq, aes(Accident_Month)) + 
   geom_line(aes(y = (predicted), colour = "predicted")) + 
   geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
-                                                         y = "Claims Frequency")
+                                                         y = "Claims Frequency",
+                                                         title = "Poisson (Actual vs Predicted)")
 
 Actual_vs_pred_freq
 
 #Graph for Quasi
 results_freq1 <- data.frame(predicted = exp(quasi_freq_pred),
-                            actual = as.double(GLM_frequency_1$frequency),
-                            Accident_Month = GLM_frequency_1$claim_month)
+                            actual = (GLM_frequency_3$Claim_Count[-c(49:60)]), 
+                            Accident_Month = GLM_frequency_3$claim_month[-c(49:60)])
 
 Actual_vs_pred_freq1 <- ggplot(results_freq1, aes(Accident_Month)) + 
   geom_line(aes(y = (predicted), colour = "predicted")) + 
   geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
-                                                         y = "Claims Frequency")
+                                                         y = "Claims Frequency",
+                                                         title = "Quasipoisson (Actual vs Predicted)")
 
 Actual_vs_pred_freq1
 
 #Graph for NB
 results_freq2 <- data.frame(predicted = exp(nb_freq_pred),
-                            actual = as.double(GLM_frequency_1$Claim_Count),
-                            Accident_Month = GLM_frequency_1$claim_month)
+                            actual = (GLM_frequency_3$Claim_Count[-c(49:60)]), 
+                            Accident_Month = GLM_frequency_3$claim_month[-c(49:60)])
 
 Actual_vs_pred_freq2 <- ggplot(results_freq2, aes(Accident_Month)) + 
   geom_line(aes(y = (predicted), colour = "predicted")) + 
-  geom_line(aes(y = (actual), colour = "actual")) + labs(x = "Accident Month",
-                                                         y = "Claims Frequency")
+  geom_line(aes(y = (actual), colour = "actual")) + 
+  labs(x = "Accident Month",y = "Claims Frequency",
+       title = "Negative Binomial (Actual vs Predicted)")
 
 Actual_vs_pred_freq2
+
+
 
 
