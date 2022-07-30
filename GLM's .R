@@ -12,6 +12,7 @@ library(forcats)
 library(AER)
 library(pscl)
 library(boot)
+library(sjPlot)
 
 #import the dataset
 Commercial <- read.csv("ACTL3142Data.csv") 
@@ -162,72 +163,87 @@ Actual_vs_pred_sev1
 Claims_frequency <- Commercial_3 %>% group_by(claim_month) %>% 
   summarise(Claim_Count = sum((total_claims_cost)*0 +1), exposure_1 = sum(exposure))
 
-GLM_frequency <- cbind(Claims_frequency, External_data_1[,-1])
+GLM_frequency <- cbind(Claims_frequency, External_data_1[,-1], Sum_insured_Monthly[,4])
 GLM_frequency_1 <- GLM_frequency %>% group_by(claim_month) %>%
   mutate(frequency = Claim_Count/exposure_1)
 
+GLM_frequency_2 <- cbind(External_data_lagged_1, GLM_frequency_1[c(49:60), c(2,3,9,10)])
+col_order_2 <- c("claim_month", "Claim_Count", "exposure_1",
+                 "Iron_Steel_Import", "Oil.Production","Imports_Machinery_TranspEquip",
+                 "Transport_Parts_import", "gold.price", "Avg_sum_insured", "frequency")
+GLM_frequency_2 <- GLM_frequency_2[, col_order_2]
+
+GLM_frequency_3 <- rbind(GLM_frequency_2, GLM_frequency_1)
+
+
 #GLM
-pois_freq <- glm(frequency ~., data = GLM_frequency_1[ ,-c(1,2,3)],
-                 family = poisson(link = "log"))
+pois_freq <- glm(Claim_Count ~., data = GLM_frequency_3[c(1:60) ,-c(1,3,10)],
+                 family = poisson(link = "log"), offset = log(GLM_frequency_3$exposure_1)[1:60])
 
 summary(pois_freq)
 
-pois_freq_pred <- predict.glm(pois_freq, newdata = GLM_frequency_1)
-sum((pois_freq_pred - GLM_frequency$Claim_Count)^2)
+pois_freq_pred <- predict.glm(pois_freq, newdata = GLM_frequency_3[-c(49:60),])
+sum((pois_freq_pred - GLM_frequency_3[-c(49:60),]$Claim_Count)^2)
 
-set.seed(1010)
-kfold_error_5a <- rep(0,5)
-for (i in 1:5) {pois_freq
-  kfold_error_5a[i] <- cv.glm(GLM_frequency_1, pois_freq, K = 5)$delta[1]
-}
-kfold_error_5a
-mean(kfold_error_5a)
+#K-FOLD NOT WORKING
+#set.seed(1010)
+#kfold_error_5a <- rep(0,5)
+#for (i in 1:5) {pois_freq
+#  kfold_error_5a[i] <- cv.glm(GLM_frequency_3[-c(49:60),], pois_freq, K = 5)$delta[1]
+#}
+#kfold_error_5a
+#mean(kfold_error_5a)
+
+pois_kfold_plot <- plot_kfold_cv(data = GLM_frequency_3[-c(49:60),], pois_freq)
+pois_kfold_plot
 
 #dispersion test
 dispersiontest(pois_freq)
 
 # Quasi Poisson
-quasi_freq <- glm(frequency ~., data = GLM_frequency_1[ ,-c(1,2,3)],
+quasi_freq <- glm(as.integer(frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1,2,3)],
                  family = quasipoisson(link = "log"))
 
 summary(quasi_freq)
 
-quasi_freq_pred <- predict.glm(quasi_freq, newdata = GLM_frequency_1)
-sum((quasi_freq_pred - GLM_frequency$Claim_Count)^2)
+quasi_freq_pred <- predict.glm(quasi_freq, newdata = GLM_frequency_3[-c(49:60),])
+sum((quasi_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2)
 
 set.seed(2020)
 kfold_error_5b <- rep(0,5)
 for (i in 1:5) {quasi_freq
-  kfold_error_5b[i] <- cv.glm(GLM_frequency_1, quasi_freq, K = 5)$delta[1]
+  kfold_error_5b[i] <- cv.glm(GLM_frequency_3[-c(49:60),], quasi_freq, K = 5)$delta[1]
 }
 kfold_error_5b
 mean(kfold_error_5b)
 
 # Negative Binomial
-GLM_frequency_1[,-1] <- mutate_all(GLM_frequency_1[,-1], function(x) as.integer(x))
-nb_freq <- glm.nb(Claim_Count ~., data = GLM_frequency_1[ ,-c(1,9)],
-                  control = glm.control(maxit = 10000), offset=log(exposure_1))
+nb_freq <- glm.nb(Claim_Count ~., data = GLM_frequency_3[c(1:60) ,-c(1,3,10)],
+                  control = glm.control(maxit = 10000), offset=log(GLM_frequency_3$exposure_1[1:60]))
 
 summary(nb_freq)
 
-nb_freq_pred <- predict.glm(nb_freq, newdata = GLM_frequency_1)
-sum((nb_freq_pred - GLM_frequency$Claim_Count)^2)
+nb_freq_pred <- predict.glm(nb_freq, newdata = GLM_frequency_3[-c(49:60),])
+sum((nb_freq_pred - GLM_frequency_3[-c(49:60),]$Claim_Count)^2)
 
 # K fold not working
-set.seed(3030)
-kfold_error_5c <- rep(0,5)
-for (i in 1:5) {nb_freq
-  kfold_error_5c[i] <- cv.glm(GLM_frequency_1, nb_freq, K = 5)$delta[1]
-}
-kfold_error_5c
-mean(kfold_error_5c)
+#set.seed(3030)
+#kfold_error_5c <- rep(0,5)
+#for (i in 1:5) {nb_freq
+#  kfold_error_5c[i] <- cv.glm(GLM_frequency_3[-c(49:60),], nb_freq, K = 5)$delta[1]
+#}
+#kfold_error_5c
+#mean(kfold_error_5c)
 
-#CANT DO ZERO INFLATED MODELS WITHOUT ZERO's [must be done on the original data]
+#Since K fold not working (under fits for smaller values and overfits for larger values)
+nb_kfold_plot <- plot_kfold_cv(data = GLM_frequency_3[-c(49:60),], nb_freq, K = 5)
+nb_kfold_plot
+
 
 #Graph for poisson
 results_freq <- data.frame(predicted = exp(pois_freq_pred), 
-                          actual = (GLM_frequency_1$frequency), 
-                          Accident_Month = GLM_frequency_1$claim_month)
+                          actual = (GLM_frequency_3$Claim_Count[-c(49:60)]), 
+                          Accident_Month = GLM_frequency_3$claim_month[-c(49:60)])
 
 
 Actual_vs_pred_freq <- ggplot(results_freq, aes(Accident_Month)) + 
