@@ -205,7 +205,7 @@ pois_freq <- glm(as.integer(frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1,
 summary(pois_freq)
 
 pois_freq_pred <- predict.glm(pois_freq, newdata = GLM_frequency_3[-c(49:60),])
-(sum((pois_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
+pois_mse <- (sum((exp(pois_freq_pred) - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
 
 #K-FOLD pois
 set.seed(1010)
@@ -226,7 +226,7 @@ quasi_freq <- glm(as.integer(frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1
 summary(quasi_freq)
 
 quasi_freq_pred <- predict.glm(quasi_freq, newdata = GLM_frequency_3[-c(49:60),])
-(sum((quasi_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
+mse_quasi <- (sum((exp(quasi_freq_pred) - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
 
 #K-Fold quasi
 set.seed(2020)
@@ -245,7 +245,7 @@ nb_freq <- glm.nb((frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1,2,3)],
 summary(nb_freq)
 
 nb_freq_pred <- predict.glm(nb_freq, newdata = GLM_frequency_3[-c(49:60),])
-(sum((nb_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
+mse_nb <- (sum((exp(nb_freq_pred) - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
 
 # K fold not working
 set.seed(3030)
@@ -303,6 +303,7 @@ Actual_vs_pred_freq2
 
 
 #Claims Inflation
+
 
 
 
