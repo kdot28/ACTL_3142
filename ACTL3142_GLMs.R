@@ -304,8 +304,21 @@ Actual_vs_pred_freq2
 
 #Claims Inflation
 
+Severity_predictions <-results_sev
+freq_predictions <- results_freq2
 
 
+inflation_predictions <-data.frame(predicted = Severity_predictions$predicted*freq_predictions$predicted*GLM_frequency_3$exposure_1[-c(49:60)],
+                                   actual = Severity_predictions$actual*freq_predictions$actual*GLM_frequency_3$exposure_1[1:60],
+                                   month = Severity_predictions$Accident_Month)
 
+inflation_predictions
 
+inflation <- ggplot(inflation_predictions, aes(month)) +
+  geom_line(aes(y = predicted, colour = "predicted")) +
+  geom_line(aes(y = actual, colour = "actual")) +
+  labs(x = "Accident Month", y = "Claims Inflation",
+       title = "Claims inflation")
+
+inflation
 
