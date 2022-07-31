@@ -180,13 +180,6 @@ for (i in 1:length(vehicle_class)) {
 Commercial_new <- Commercial_new %>%
   cbind(vehicle_level)
 
-#  Frequency 
-
-# NUMBER of policies active per month
-df <- data.frame(month =Monthly_claim_count$Accident_Month1, no_active_policies = 0)
-df$no_active_policies<- table(Commercial$accident_month)
-
-
 
 # DATA VISUALISATION
 

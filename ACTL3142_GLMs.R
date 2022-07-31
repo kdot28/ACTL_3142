@@ -181,6 +181,10 @@ Actual_vs_pred_sev1 <- ggplot(results_sev1, aes(Accident_Month)) +
 Actual_vs_pred_sev1
 
 # --------------- Claims Frequency Modelling ------------------
+# NUMBER of policies active per month
+df <- data.frame(month =Monthly_claim_count$Accident_Month1, no_active_policies = 0)
+df$no_active_policies<- table(Commercial$accident_month)
+
 Claims_frequency <- Commercial_3 %>% group_by(claim_month) %>% 
   summarise(Claim_Count = sum((total_claims_cost)*0 +1), exposure_1 = sum(exposure))
 
