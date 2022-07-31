@@ -194,7 +194,7 @@ col_order_2 <- c("claim_month", "Claim_Count", "exposure_1",
                  "Transport_Parts_import", "gold.price", "Avg_sum_insured", "frequency")
 GLM_frequency_2 <- GLM_frequency_2[, col_order_2]
 
-GLM_frequency_3 <- rbind(GLM_frequency_2, GLM_frequency_1)
+GLM_frequency_3 <- rbind(GLM_frequency_1,GLM_frequency_2,)
 
 
 #Poisson
@@ -244,7 +244,7 @@ nb_freq <- glm.nb((frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1,2,3)],
 summary(nb_freq)
 
 nb_freq_pred <- predict.glm(nb_freq, newdata = GLM_frequency_3[-c(49:60),])
-sum((nb_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2)
+(sum((nb_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
 
 # K fold not working
 set.seed(3030)
@@ -302,5 +302,7 @@ Actual_vs_pred_freq2
 
 
 #Claims Inflation
+
+
 
 
