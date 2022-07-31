@@ -120,13 +120,13 @@ GLM_severity_2 <- rbind(GLM_severity, GLM_severity_1)
 #test_sev <- !train_sev
 
 #Gamma GLM
-gamma_sev <- glm(claims_sev ~., data = GLM_severity_2[c(1:60),-1],
+gamma_sev <- glm(log(claims_sev) ~., data = GLM_severity_2[c(1:60),-1],
               family = Gamma(link = "log"))
 
 summary(gamma_sev)
 
 gamma_sev_pred <- predict.glm(gamma_sev, newdata = GLM_severity_2[-c(49:60),])
-sum((gamma_sev_pred - GLM_severity_2[-c(49:60),]$claims_sev)^2)
+(sum((gamma_sev_pred - log(GLM_severity_2[-c(49:60),]$claims_sev))^2))/60
 
 set.seed(1010)
 kfold_error_5 <- rep(0,5)
@@ -137,12 +137,12 @@ kfold_error_5
 mean(kfold_error_5)
 
 #Guassian GLM
-gaus_sev <- glm(claims_sev ~., data = GLM_severity_2[c(1:60),-1],
+gaus_sev <- glm(log(claims_sev) ~., data = GLM_severity_2[c(1:60),-1],
                 family = gaussian(link = "log"))
 summary(gaus_sev)
 
 gaus_sev_pred <- predict.glm(gaus_sev, newdata = GLM_severity_2[-c(49:60),])
-sum((gaus_sev_pred - GLM_severity_2[-c(49:60),]$claims_sev)^2)
+(sum((gaus_sev_pred - log(GLM_severity_2[-c(49:60),]$claims_sev))^2))/60
 
 set.seed(110)
 kfold_error_5x <- rep(0,5)
@@ -153,7 +153,7 @@ kfold_error_5x
 mean(kfold_error_5x)
 
 #Graph for Gamma 
-results_sev <- data.frame(predicted = exp(gamma_sev_pred), 
+results_sev <- data.frame(predicted = exp(exp(gamma_sev_pred)), 
                           actual = (GLM_severity_2$claims_sev[-c(49:60)]), 
                           Accident_Month = GLM_severity_2$claim_month[-c(49:60)])
 
@@ -167,7 +167,7 @@ Actual_vs_pred_sev <- ggplot(results_sev, aes(Accident_Month)) +
 Actual_vs_pred_sev
 
 #Graph for Gaussian
-results_sev1 <- data.frame(predicted = exp(gaus_sev_pred), 
+results_sev1 <- data.frame(predicted = exp(exp(gaus_sev_pred)), 
                                           actual = (GLM_severity_2$claims_sev[-c(49:60)]), 
                                           Accident_Month = GLM_severity_2$claim_month[-c(49:60)])
 
@@ -204,7 +204,7 @@ pois_freq <- glm(as.integer(frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1,
 summary(pois_freq)
 
 pois_freq_pred <- predict.glm(pois_freq, newdata = GLM_frequency_3[-c(49:60),])
-sum((pois_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2)
+(sum((pois_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
 
 #K-FOLD pois
 set.seed(1010)
@@ -225,7 +225,7 @@ quasi_freq <- glm(as.integer(frequency) ~., data = GLM_frequency_3[c(1:60) ,-c(1
 summary(quasi_freq)
 
 quasi_freq_pred <- predict.glm(quasi_freq, newdata = GLM_frequency_3[-c(49:60),])
-sum((quasi_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2)
+(sum((quasi_freq_pred - GLM_frequency_3[-c(49:60),]$frequency)^2))/60
 
 #K-Fold quasi
 set.seed(2020)
@@ -302,6 +302,8 @@ Actual_vs_pred_freq2
 
 
 #Claims Inflation
+
+
 
 
 
