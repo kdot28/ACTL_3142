@@ -192,9 +192,10 @@ GLM_frequency_2 <- cbind(External_data_lagged_1, GLM_frequency_1[c(49:60), c(2,3
 col_order_2 <- c("claim_month", "Claim_Count", "exposure_1",
                  "Iron_Steel_Import", "Oil.Production","Imports_Machinery_TranspEquip",
                  "Transport_Parts_import", "gold.price", "Avg_sum_insured", "frequency")
+                 
 GLM_frequency_2 <- GLM_frequency_2[, col_order_2]
 
-GLM_frequency_3 <- rbind(GLM_frequency_1,GLM_frequency_2,)
+GLM_frequency_3 <- rbind(GLM_frequency_1,GLM_frequency_2)
 
 
 #Poisson
