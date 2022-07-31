@@ -194,7 +194,7 @@ col_order_2 <- c("claim_month", "Claim_Count", "exposure_1",
                  "Transport_Parts_import", "gold.price", "Avg_sum_insured", "frequency")
 GLM_frequency_2 <- GLM_frequency_2[, col_order_2]
 
-GLM_frequency_3 <- rbind(GLM_frequency_2, GLM_frequency_1)
+GLM_frequency_3 <- rbind(GLM_frequency_1,GLM_frequency_2,)
 
 
 #Poisson
