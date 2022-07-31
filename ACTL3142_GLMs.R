@@ -78,10 +78,10 @@ Sum_insured_Monthly <- Commercial_3 %>%
 #An initial veiwing of relevant variables
 
 #freq
-train.control<-trainControl(method = "cv", number = 10)
-step.model <- train(Claim_Count~., data = GLM_frequency_3 ,
+train.control<-trainControl(method = "cv", number = 8)
+step.model <- train(Claim_Count~., data = GLM_frequency_3[,-c(8,10)] ,
                     method = "leapBackward",
-                    tuneGrid = data.frame(nvmax = 1:10),
+                    tuneGrid = data.frame(nvmax = 1:8),
                     trControl = train.control)
 
 step.model$results
@@ -307,6 +307,9 @@ Actual_vs_pred_freq2
 
 
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 8bbbf6274d5b3d81066f8d757c2e0bf1bb659b93
